@@ -7,6 +7,7 @@ import { openTaskModal } from '../../ui/ModalFactory'
 import { renderAddButton } from '../../ui/composites/addButton'
 import { compareTask } from './TableFilters'
 import { renderTaskRow, updateSelectedRow, updateSelectAllCheckbox } from './TableRow'
+import { t } from '../../i18n'
 
 type SortKey = 'title' | 'status' | 'priority' | 'due' | 'assignees' | 'progress'
 type SortDir = 'asc' | 'desc'
@@ -104,13 +105,14 @@ export function renderTable(ctx: TableContext): void {
   }
 
   for (const col of cols) {
+    const label = t(col.label)
     const th = hrow.createEl('th')
     if (col.width) th.setCssStyles({ width: col.width })
     if (col.key) {
       th.addClass('pm-table-th-sortable')
       th.setAttribute('role', 'button')
-      th.setAttribute('aria-label', `Sort by ${col.label}`)
-      th.createSpan({ text: col.label })
+      th.setAttribute('aria-label', `${t('Sort by')} ${label}`)
+      th.createSpan({ text: label })
       sortableHeaders.push({ key: col.key, th })
       th.addEventListener('click', () => {
         if (ctx.state.sortKey === col.key) {
@@ -123,7 +125,7 @@ export function renderTable(ctx: TableContext): void {
         refreshTableBody(ctx)
       })
     } else {
-      th.setText(col.label)
+      th.setText(label)
     }
   }
   paintSortIndicators()
@@ -239,7 +241,7 @@ function renderWindowRows(ctx: TableContext): void {
 
   const addRow = tbody.createEl('tr', { cls: 'pm-table-add-row' })
   const addCell = addRow.createEl('td', { attr: { colspan: String(colCount) } })
-  renderAddButton(addCell, 'Add task', () => {
+  renderAddButton(addCell, t('Add task'), () => {
     openTaskModal(ctx.plugin, ctx.project, { onSave: () => ctx.onRefresh() })
   })
 

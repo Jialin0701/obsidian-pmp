@@ -1,4 +1,5 @@
 import { ProgressBar } from '../primitives/ProgressBar'
+import { t } from '../../i18n'
 
 export interface ProjectCardProps {
   title: string
@@ -26,7 +27,7 @@ export class ProjectCard {
 
     const meta = body.createDiv('pm-project-card-meta')
     meta.createSpan({
-      text: `${props.tasksDone}/${props.tasksTotal} tasks`,
+      text: t(`${props.tasksDone}/${props.tasksTotal} tasks`),
       cls: 'pm-project-card-tasks'
     })
 

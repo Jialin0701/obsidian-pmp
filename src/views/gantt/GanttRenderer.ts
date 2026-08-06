@@ -1,5 +1,5 @@
 import type PMPlugin from '../../main'
-import type { Project, StatusConfig } from '../../types'
+import type { PriorityConfig, Project, StatusConfig } from '../../types'
 import type { FlatTask } from '../../store/TaskTreeOps'
 import type { TimelineCfg } from './TimelineConfig'
 import { ROW_HEIGHT, HEADER_HEIGHT, dateToX } from './TimelineConfig'
@@ -19,6 +19,7 @@ export interface RendererContext {
   project: Project
   /** Resolved once per render pass. */
   statuses: StatusConfig[]
+  priorities: PriorityConfig[]
   flatTasks: FlatTask[]
   drag: DragState
   link: LinkState

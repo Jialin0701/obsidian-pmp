@@ -1,4 +1,5 @@
 import { ExtraButtonComponent } from 'obsidian'
+import { t } from '../../i18n'
 
 export class IconButton {
   el: HTMLElement
@@ -16,7 +17,7 @@ export class IconButton {
   }
 
   setTooltip(text: string): this {
-    this.button.setTooltip(text)
+    this.button.setTooltip(t(text))
     return this
   }
 

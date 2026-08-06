@@ -1,7 +1,7 @@
 import { Notice } from 'obsidian'
 import type { Task } from '../../types'
 import { openTaskModal } from '../../ui/ModalFactory'
-import { svgEl, getStatusConfig, safeAsync } from '../../utils'
+import { svgEl, getStatusConfig, getPriorityConfig, safeAsync } from '../../utils'
 import { parsePlainDate } from '../../dates'
 import {
   ROW_HEIGHT,
@@ -111,8 +111,9 @@ export function renderTaskBar(g: SVGGElement, task: Task, row: number, _depth: n
   }
 
   const ttEl = svgEl('title', {})
-  const assigneesStr = task.assignees.length ? `\nAssignees: ${task.assignees.join(', ')}` : ''
-  ttEl.textContent = `${task.title}\n${statusConfig?.label ?? task.status} \u00b7 ${task.priority}\nStart: ${task.start || '\u2014'}  Due: ${task.due || '\u2014'}\nProgress: ${task.progress}%${assigneesStr}`
+  const priorityConfig = getPriorityConfig(ctx.priorities, task.priority)
+  const assigneesStr = task.assignees.length ? `\n${t('Assignees')}: ${task.assignees.join(', ')}` : ''
+  ttEl.textContent = `${task.title}\n${t(statusConfig?.label ?? task.status)} \u00b7 ${t(priorityConfig?.label ?? task.priority)}\n${t('Start')}: ${task.start || '\u2014'}  ${t('Due')}: ${task.due || '\u2014'}\n${t('Progress')}: ${task.progress}%${assigneesStr}`
   rect.appendChild(ttEl)
 
   const HANDLE_W = 8
@@ -263,7 +264,7 @@ function renderEmptyRowClickTarget(g: SVGGElement, task: Task, row: number, ctx:
   )
 
   const tt = svgEl('title', {})
-  tt.textContent = 'Click to set dates'
+  tt.textContent = t('Click to set dates')
   hitArea.appendChild(tt)
 }
 
@@ -286,7 +287,7 @@ function renderMilestoneDiamond(g: SVGGElement, task: Task, row: number, color: 
   g.appendChild(diamond)
 
   const tt = svgEl('title', {})
-  tt.textContent = `${task.title} (milestone)\nDate: ${task.due || task.start || '\u2014'}`
+  tt.textContent = `${task.title}（${t('Milestone')}）\n${t('Date')}: ${task.due || task.start || '\u2014'}`
   diamond.appendChild(tt)
 
   diamond.addEventListener('click', () => {

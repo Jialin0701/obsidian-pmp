@@ -15,7 +15,7 @@ export interface TaskMenuContext {
 export function buildTaskContextMenu(menu: Menu, task: Task, ctx: TaskMenuContext): Menu {
   menu.addItem((item) =>
     item
-      .setTitle('Edit task')
+      .setTitle(t('Edit task'))
       .setIcon('pencil')
       .onClick(() => {
         openTaskModal(ctx.plugin, ctx.project, {
@@ -28,7 +28,7 @@ export function buildTaskContextMenu(menu: Menu, task: Task, ctx: TaskMenuContex
   )
   menu.addItem((item) =>
     item
-      .setTitle('Add subtask')
+      .setTitle(t('Add subtask'))
       .setIcon('plus')
       .onClick(() => {
         openTaskModal(ctx.plugin, ctx.project, {
@@ -41,7 +41,7 @@ export function buildTaskContextMenu(menu: Menu, task: Task, ctx: TaskMenuContex
   )
   menu.addItem((item) =>
     item
-      .setTitle('Duplicate task')
+      .setTitle(t('Duplicate task'))
       .setIcon('copy')
       .onClick(
         safeAsync(async () => {
@@ -60,7 +60,7 @@ export function buildTaskContextMenu(menu: Menu, task: Task, ctx: TaskMenuContex
   if (task.archived) {
     menu.addItem((item) =>
       item
-        .setTitle('Unarchive')
+        .setTitle(t('Unarchive'))
         .setIcon('archive-restore')
         .onClick(
           safeAsync(async () => {
@@ -73,7 +73,7 @@ export function buildTaskContextMenu(menu: Menu, task: Task, ctx: TaskMenuContex
   } else {
     menu.addItem((item) =>
       item
-        .setTitle('Archive')
+        .setTitle(t('Archive'))
         .setIcon('archive')
         .onClick(
           safeAsync(async () => {
@@ -86,7 +86,7 @@ export function buildTaskContextMenu(menu: Menu, task: Task, ctx: TaskMenuContex
   }
   menu.addItem((item) =>
     item
-      .setTitle('Delete task')
+      .setTitle(t('Delete task'))
       .setIcon('trash')
       .onClick(
         safeAsync(async () => {

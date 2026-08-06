@@ -3,6 +3,7 @@ import { Chip } from '../../primitives/Chip'
 import { IconButton } from '../../primitives/IconButton'
 import { renderTagChip } from '../tagChip'
 import { makeInlineEdit } from './inlineEdit'
+import { t } from '../../../i18n'
 
 export interface TitleCellProps {
   task: Task
@@ -45,7 +46,7 @@ export class TitleCell {
 
     if (task.type === 'milestone') {
       new Chip(this.el)
-        .setLabel('M')
+        .setLabel(t('M'))
         .setVariant('solid')
         .setSize('sm')
         .setColor('var(--color-purple)')
@@ -53,7 +54,7 @@ export class TitleCell {
     }
     if (task.type === 'subtask') {
       new Chip(this.el)
-        .setLabel('Sub')
+        .setLabel(t('Sub'))
         .setVariant('solid')
         .setSize('sm')
         .setColor('var(--color-green)')
@@ -61,7 +62,7 @@ export class TitleCell {
     }
     if (task.recurrence) {
       new Chip(this.el)
-        .setLabel('R')
+        .setLabel(t('R'))
         .setVariant('solid')
         .setSize('sm')
         .setColor('var(--color-blue)')
@@ -69,7 +70,7 @@ export class TitleCell {
     }
     if (task.archived) {
       new Chip(this.el)
-        .setLabel('Archived')
+        .setLabel(t('Archived'))
         .setVariant('solid')
         .setSize('sm')
         .setColor('var(--text-muted)')

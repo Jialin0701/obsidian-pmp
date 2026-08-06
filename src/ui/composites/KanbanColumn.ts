@@ -2,6 +2,7 @@ import { setIcon } from 'obsidian'
 import type { Task } from '../../types'
 import { formatBadgeText, isIconName, safeAsync } from '../../utils'
 import { KanbanCard } from './KanbanCard'
+import { t } from '../../i18n'
 
 export interface KanbanColumnStatus {
   id: string
@@ -48,9 +49,9 @@ export class KanbanColumn {
     const badge = titleRow.createSpan({ cls: 'pm-kanban-col-badge' })
     if (props.status.icon && isIconName(props.status.icon)) {
       setIcon(badge.createSpan({ cls: 'pm-kanban-col-badge-icon' }), props.status.icon)
-      badge.appendText(props.status.label)
+      badge.appendText(t(props.status.label))
     } else {
-      badge.setText(formatBadgeText(props.status.icon, props.status.label))
+      badge.setText(formatBadgeText(props.status.icon, t(props.status.label)))
     }
     badge.style.color = props.status.color
 

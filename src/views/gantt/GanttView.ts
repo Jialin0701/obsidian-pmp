@@ -25,6 +25,7 @@ import { svgEl } from '../../utils'
 import { Temporal, today } from '../../dates'
 import type { RendererContext } from './GanttRenderer'
 import { renderTaskLabel } from './TaskLabelRenderer'
+import { t } from '../../i18n'
 
 export class GanttView implements SubView {
   private granularity: GanttGranularity
@@ -94,7 +95,12 @@ export class GanttView implements SubView {
   private renderGranularityControls(): void {
     const bar = this.container.createDiv('pm-gantt-controls')
     const levels: GanttGranularity[] = ['day', 'week', 'month', 'quarter']
-    const labels: Record<GanttGranularity, string> = { day: 'Day', week: 'Week', month: 'Month', quarter: 'Quarter' }
+    const labels: Record<GanttGranularity, string> = {
+      day: t('Day'),
+      week: t('Week'),
+      month: t('Month'),
+      quarter: t('Quarter')
+    }
 
     new SegmentedControl<GanttGranularity>(bar, {
       options: levels.map((level) => ({ id: level, label: labels[level] })),
@@ -108,10 +114,10 @@ export class GanttView implements SubView {
     })
 
     bar.createSpan({ cls: 'pm-gantt-sep' })
-    new ButtonComponent(bar).setButtonText('Today').onClick(() => this.scrollToToday())
+    new ButtonComponent(bar).setButtonText(t('Today')).onClick(() => this.scrollToToday())
 
-    new ButtonComponent(bar).setButtonText('Expand all').onClick(() => this.setAllCollapsed(false))
-    new ButtonComponent(bar).setButtonText('Collapse all').onClick(() => this.setAllCollapsed(true))
+    new ButtonComponent(bar).setButtonText(t('Expand all')).onClick(() => this.setAllCollapsed(false))
+    new ButtonComponent(bar).setButtonText(t('Collapse all')).onClick(() => this.setAllCollapsed(true))
   }
 
   private renderGantt(): void {
@@ -122,7 +128,7 @@ export class GanttView implements SubView {
     leftPanel.style.minWidth = `${this.labelWidth}px`
     const leftHeader = leftPanel.createDiv('pm-gantt-left-header')
     leftHeader.style.height = `${HEADER_HEIGHT}px`
-    leftHeader.createSpan({ text: 'Task', cls: 'pm-gantt-left-header-label' })
+    leftHeader.createSpan({ text: t('Task'), cls: 'pm-gantt-left-header-label' })
     const leftBody = leftPanel.createDiv('pm-gantt-left-body')
 
     const resizeHandle = wrapper.createDiv('pm-gantt-resize-handle')
@@ -230,7 +236,7 @@ export class GanttView implements SubView {
 
     const addRow = leftBody.createDiv('pm-gantt-label-row pm-gantt-add-row')
     addRow.style.height = `${ROW_HEIGHT}px`
-    renderAddButton(addRow, 'Add task', () => {
+    renderAddButton(addRow, t('Add task'), () => {
       openTaskModal(this.plugin, this.project, { onSave: () => this.onRefresh() })
     })
 
@@ -285,13 +291,15 @@ export class GanttView implements SubView {
   }
 
   private makeRendererContext(): RendererContext {
+    const config = this.plugin.store.configFor(this.project)
     return {
       svgEl: this.svgEl,
       headerSvgEl: this.headerSvgEl,
       cfg: this.cfg,
       plugin: this.plugin,
       project: this.project,
-      statuses: this.plugin.store.configFor(this.project).statuses,
+      statuses: config.statuses,
+      priorities: config.priorities,
       flatTasks: this.flatTasks,
       drag: this.drag,
       link: this.link,

@@ -2,6 +2,7 @@ import { Menu } from 'obsidian'
 import type { Task, TaskStatus, TaskPriority, StatusConfig, PriorityConfig } from '../types'
 import { getStatusConfig, getPriorityConfig, formatBadgeText, isIconName } from '../utils'
 import { Chip } from './primitives/Chip'
+import { t } from '../i18n'
 
 /** Named icons only. Emoji and text render inline through formatBadgeText instead. */
 function namedIcon(config: { icon: string } | undefined): string | null {
@@ -16,7 +17,7 @@ export function renderStatusBadge(
 ): HTMLElement {
   const config = getStatusConfig(statuses, task.status)
   const badge = new Chip(container)
-    .setLabel(formatBadgeText(config?.icon, config?.label ?? task.status))
+    .setLabel(formatBadgeText(config?.icon, t(config?.label ?? task.status)))
     .setColor(config?.color ?? 'var(--text-muted)')
     .setVariant('solid')
     .setDot(!config?.icon)
@@ -25,7 +26,7 @@ export function renderStatusBadge(
       for (const s of statuses) {
         menu.addItem((item) => {
           item
-            .setTitle(formatBadgeText(s.icon, s.label))
+            .setTitle(formatBadgeText(s.icon, t(s.label)))
             .setChecked(s.id === task.status)
             .onClick(() => onChange(s.id))
           const icon = namedIcon(s)
@@ -54,7 +55,7 @@ export function renderPriorityBadge(
 ): HTMLElement {
   const config = getPriorityConfig(priorities, task.priority)
   const badge = new Chip(container)
-    .setLabel(formatBadgeText(config?.icon, config?.label ?? task.priority))
+    .setLabel(formatBadgeText(config?.icon, t(config?.label ?? task.priority)))
     .setColor(config?.color ?? 'var(--text-muted)')
     .setVariant('plain')
   const icon = namedIcon(config)
@@ -68,7 +69,7 @@ export function renderPriorityBadge(
     for (const p of priorities) {
       menu.addItem((item) => {
         item
-          .setTitle(formatBadgeText(p.icon, p.label))
+          .setTitle(formatBadgeText(p.icon, t(p.label)))
           .setChecked(p.id === task.priority)
           .onClick(() => onChange(p.id))
         const itemIcon = namedIcon(p)

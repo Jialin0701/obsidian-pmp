@@ -1,5 +1,6 @@
 import { Menu } from 'obsidian'
 import { ChipButton } from './primitives/ChipButton'
+import { t } from '../i18n'
 
 export function renderFilterDropdown(
   parent: HTMLElement,
@@ -8,11 +9,11 @@ export function renderFilterDropdown(
   options: { id: string; label: string }[],
   onChange: (selected: string[]) => void
 ): HTMLElement {
-  const btn = new ChipButton(parent).setAriaLabel(`Filter by ${label}`)
+  const btn = new ChipButton(parent).setAriaLabel(t(`Filter by ${label}`))
 
   const updateLabel = () => {
     const has = selected.length > 0
-    btn.setLabel(has ? `${label}: ${selected.length}` : label).setActive(has)
+    btn.setLabel(has ? t(`${label}: ${selected.length}`) : t(label)).setActive(has)
   }
   updateLabel()
 
@@ -35,7 +36,7 @@ export function renderFilterDropdown(
     if (selected.length) {
       menu.addSeparator()
       menu.addItem((item) =>
-        item.setTitle('Clear').onClick(() => {
+        item.setTitle(t('Clear')).onClick(() => {
           selected.length = 0
           onChange(selected)
           updateLabel()

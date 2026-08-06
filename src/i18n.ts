@@ -16,6 +16,7 @@ const ZH: Record<string, string> = {
   Integrations: '集成',
   'Projects folder': '项目文件夹',
   'Vault folder where project files are stored.': '存放项目文件的库文件夹。',
+  'Enter a folder name.': '请输入文件夹名称。',
   'Default view': '默认视图',
   'View that opens when a project is opened.': '打开项目时使用的视图。',
   'Save tasks on close': '关闭时保存任务',
@@ -150,6 +151,58 @@ const ZH: Record<string, string> = {
   'Overrides for this project': '此项目的覆盖设置',
   'Extra properties for tasks': '任务的额外属性',
   'Use global': '使用全局设置',
+  'The workflow for this project': '此项目的工作流',
+  'Use custom statuses instead of the global ones': '使用自定义状态替代全局状态',
+  'The priority scale for this project': '此项目的优先级体系',
+  'Use custom priorities instead of the global ones': '使用自定义优先级替代全局优先级',
+  'Pull forward on early finish': '提前完成时提前排程',
+  'Subtasks on board': '在看板上显示子任务',
+  'Description preview on board': '在看板上显示描述预览',
+  'Add custom field': '添加自定义字段',
+  'Add option': '添加选项',
+  'New status': '新建状态',
+  'New priority': '新建优先级',
+  'Custom color': '自定义颜色',
+  'My awesome project': '我的项目名称',
+  'What is this project about?': '这个项目的描述',
+  'Field name': '字段名称',
+  Text: '文本',
+  Number: '数字',
+  'Multi-select': '多选',
+  Person: '人员',
+  Checkbox: '复选框',
+  URL: '网址',
+  Name: '名称',
+  'Pick a project…': '选择项目…',
+  'Pick a parent task…': '选择父任务…',
+  All: '全部',
+  Filter: '筛选',
+  'Time tracking': '时间记录',
+  'Log time': '记录时间',
+  Hours: '小时',
+  'Note…': '备注…',
+  Subtasks: '子任务',
+  'Expand subtasks': '展开子任务',
+  'Collapse subtasks': '折叠子任务',
+  'Task title': '任务标题',
+  'New Task': '新任务',
+  'Add a description…': '添加描述…',
+  'Person name': '人员姓名',
+  'Click to set dates': '点击设置日期',
+  'Add task': '添加任务',
+  Remove: '移除',
+  Day: '日',
+  Week: '周',
+  Month: '月',
+  Quarter: '季度',
+  Date: '日期',
+  Icon: '图标',
+  'Error: project not set for import': '错误：尚未设置要导入的项目',
+  'Statuses and priorities already match TaskNotes.': '状态和优先级已与 TaskNotes 一致。',
+  'TaskNotes 4.10 or newer is required.': '需要 TaskNotes 4.10 或更高版本。',
+  'Week number (w15)': '周数（w15）',
+  'Date range (apr 7–13)': '日期范围（4 月 7 日至 13 日）',
+  'Both (w15: apr 7–13)': '两者（w15：4 月 7 日至 13 日）',
   On: '开启',
   Off: '关闭',
   Show: '显示',
@@ -223,10 +276,14 @@ const ZH: Record<string, string> = {
   Medium: '中',
   Low: '低',
   'Task actions': '任务操作',
+  'Sort by': '排序：',
   Milestone: '里程碑',
   Subtask: '子任务',
   Recurring: '重复任务',
   Archived: '已归档',
+  M: '里',
+  Sub: '子',
+  R: '复',
   'Open as note': '作为笔记打开',
   'Estimate:': '预计时间：',
   'Remove log': '移除记录',
@@ -314,12 +371,12 @@ export function t(text: string): string {
     const label = { Today: '今天', Tomorrow: '明天', 'In 1 week': '一周后', 'In 2 weeks': '两周后' }[datedShortcut[1]]
     return `${label}（${datedShortcut[2]}）`
   }
-  const dueSoon = text.match(/^Due in (\d+)d: (.+)$/)
-  if (dueSoon) return `${dueSoon[1]} 天后截止：${dueSoon[2]}`
-  const overdueNotice = text.match(/^⚠️ Overdue: (.+) in (.+) was due (\d+)d ago$/)
-  if (overdueNotice) return `⚠️ 已逾期：${overdueNotice[1]}（${overdueNotice[2]}）已逾期 ${overdueNotice[3]} 天`
-  const dueToday = text.match(/^📅 Due today: (.+) in (.+)$/)
-  if (dueToday) return `📅 今天截止：${dueToday[1]}（${dueToday[2]}）`
+  const dueSoon = text.match(/^📅 Due in (\d+)d: "(.+)" in (.+)$/)
+  if (dueSoon) return `📅 ${dueSoon[1]} 天后截止：“${dueSoon[2]}”（${dueSoon[3]}）`
+  const overdueNotice = text.match(/^⚠️ Overdue: "(.+)" in (.+) was due (\d+)d ago$/)
+  if (overdueNotice) return `⚠️ 已逾期：“${overdueNotice[1]}”（${overdueNotice[2]}）已逾期 ${overdueNotice[3]} 天`
+  const dueToday = text.match(/^📅 Due today: "(.+)" in (.+)$/)
+  if (dueToday) return `📅 今天截止：“${dueToday[1]}”（${dueToday[2]}）`
   const migrating = text.match(/^Migrating project: (.+)\.\.\.$/)
   if (migrating) return `正在迁移项目：${migrating[1]}…`
   const migrated = text.match(/^Project Manager: Migrated (\d+) project\(s\) to new format\.$/)
@@ -328,10 +385,12 @@ export function t(text: string): string {
   if (conflict) return `任务未保存：名为“${conflict[1]}”的笔记已存在。`
   const remapped = text.match(/^Remapped (\d+) tasks? from '(.+)' to '(.+)'\.$/)
   if (remapped) return `已将 ${remapped[1]} 个任务从“${remapped[2]}”映射到“${remapped[3]}”。`
-  const moved = text.match(/^(Moved|Archived|Unarchived) (\d+) tasks?(.*)$/)
+  const moved = text.match(/^(Moved|Archived|Unarchived) (\d+) tasks?( under new parent| to top level)?$/)
   if (moved) {
     const action = { Moved: '已移动', Archived: '已归档', Unarchived: '已取消归档' }[moved[1]]
-    return `${action} ${moved[2]} 个任务${moved[3]}`
+    const destination =
+      moved[3] === ' under new parent' ? '到新的父任务下' : moved[3] === ' to top level' ? '到顶层' : ''
+    return `${action} ${moved[2]} 个任务${destination}`
   }
   const tasks = text.match(/^(\d+)\/(\d+) tasks$/)
   if (tasks) return `${tasks[1]}/${tasks[2]} 个任务`
@@ -343,6 +402,39 @@ export function t(text: string): string {
   if (noProject) return `找不到项目 ${noProject[1]}。项目可能已被删除或重命名。`
   const importCount = text.match(/^Import \((\d+)\)$/)
   if (importCount) return `导入（${importCount[1]}）`
+  const option = text.match(/^Option (\d+)$/)
+  if (option) return `选项 ${option[1]}`
+  const timeTracking = text.match(/^Time tracking \((.+)\)$/)
+  if (timeTracking) return `时间记录（${timeTracking[1]}）`
+  const createQuoted = text.match(/^Create "(.+)"$/)
+  if (createQuoted) return `创建“${createQuoted[1]}”`
+  const atLeastOne = text.match(/^You must have at least one (.+)\.$/)
+  if (atLeastOne) return `至少需要一个${t(atLeastOne[1])}。`
+  const taskNotesImport = text.match(/^Failed to import TaskNotes tasks: (.+)$/)
+  if (taskNotesImport) return `导入 TaskNotes 任务失败：${taskNotesImport[1]}`
+  const importedTasks = text.match(/^Imported (\d+) tasks?(?: \((\d+) skipped\))?$/)
+  if (importedTasks) {
+    const skipped = importedTasks[2] ? `（跳过 ${importedTasks[2]} 个）` : ''
+    return `已导入 ${importedTasks[1]} 个任务${skipped}`
+  }
+  const taskNotesPalettes = text.match(/^Imported from TaskNotes: (\d+) added, (\d+) updated\.$/)
+  if (taskNotesPalettes) {
+    return `已从 TaskNotes 导入：新增 ${taskNotesPalettes[1]} 项，更新 ${taskNotesPalettes[2]} 项。`
+  }
+  const deleteNamed = text.match(/^Delete "(.+)"\?$/)
+  if (deleteNamed) return `删除“${deleteNamed[1]}”？`
+  const deleteTasks = text.match(/^Delete (\d+) tasks?\? This cannot be undone\.$/)
+  if (deleteTasks) return `删除 ${deleteTasks[1]} 个任务？此操作无法撤销。`
+  const titleConflict = text.match(/^A note named "(.+)" already exists\. Choose a different title\.$/)
+  if (titleConflict) return `名为“${titleConflict[1]}”的笔记已存在，请使用其他标题。`
+  const failedLoadProject = text.match(/^Project Manager: Failed to load "(.+)"\. Check console for details\.$/)
+  if (failedLoadProject) return `项目管理：加载“${failedLoadProject[1]}”失败，请查看控制台了解详情。`
+  const failedLoadTask = text.match(/^Project Manager: Failed to load task "(.+)"\. Check console for details\.$/)
+  if (failedLoadTask) return `项目管理：加载任务“${failedLoadTask[1]}”失败，请查看控制台了解详情。`
+  const failedSaveProject = text.match(/^Project Manager: Failed to save "(.+)"\. Check console for details\.$/)
+  if (failedSaveProject) return `项目管理：保存“${failedSaveProject[1]}”失败，请查看控制台了解详情。`
+  const failedMigration = text.match(/^Project Manager: Migration failed for "(.+)"\. Check console for details\.$/)
+  if (failedMigration) return `项目管理：迁移“${failedMigration[1]}”失败，请查看控制台了解详情。`
   return text
 }
 

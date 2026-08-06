@@ -1,4 +1,5 @@
 import { setIcon } from 'obsidian'
+import { t } from '../../i18n'
 
 /** The ghost "+ label" shared by every add row. */
 export function renderAddButton(
@@ -8,7 +9,7 @@ export function renderAddButton(
 ): HTMLButtonElement {
   const btn = parent.createEl('button', { cls: 'pm-prop-add' })
   setIcon(btn.createSpan({ cls: 'pm-glyph-icon' }), 'plus')
-  btn.createSpan({ cls: 'pm-prop-add-label', text: label })
+  btn.createSpan({ cls: 'pm-prop-add-label', text: t(label) })
   btn.addEventListener('click', onClick)
   return btn
 }

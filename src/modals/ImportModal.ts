@@ -98,7 +98,7 @@ export class ImportModal extends Modal {
 
     const header = contentEl.createDiv('import-modal-header')
 
-    header.createEl('h2', { text: 'Select notes to import' })
+    header.createEl('h2', { text: t('Select notes to import') })
 
     this.counterLabel = header.createDiv('import-counter')
     this.updateCounter()
@@ -108,7 +108,7 @@ export class ImportModal extends Modal {
     this.searchInput = searchContainer.createEl('input', {
       type: 'text',
       cls: 'prompt-input import-search-input',
-      placeholder: 'Search files...'
+      placeholder: t('Search files...')
     })
     this.searchInput.addEventListener('input', () => this.handleSearch())
 
@@ -123,7 +123,7 @@ export class ImportModal extends Modal {
     })
     this.selectAllCheckbox.addEventListener('change', () => this.handleSelectAll())
 
-    const selectAllLabel = selectAllRow.createEl('label', { text: 'Select all' })
+    const selectAllLabel = selectAllRow.createEl('label', { text: t('Select all') })
     selectAllLabel.addEventListener('click', () => {
       if (this.selectAllCheckbox) {
         this.selectAllCheckbox.checked = !this.selectAllCheckbox.checked
@@ -135,10 +135,10 @@ export class ImportModal extends Modal {
 
     const footer = contentEl.createDiv('import-modal-footer')
 
-    new ButtonComponent(footer).setButtonText('Cancel').onClick(() => this.close())
+    new ButtonComponent(footer).setButtonText(t('Cancel')).onClick(() => this.close())
 
     this.nextButton = new ButtonComponent(footer)
-      .setButtonText('Next')
+      .setButtonText(t('Next'))
       .setCta()
       .setDisabled(this.selectedCount === 0)
       .onClick(() => this.handleNext())
@@ -149,17 +149,17 @@ export class ImportModal extends Modal {
     contentEl.empty()
 
     const header = contentEl.createDiv('import-options-header')
-    header.createEl('h2', { text: 'Import options' })
+    header.createEl('h2', { text: t('Import options') })
 
     const content = contentEl.createDiv('import-options-content')
 
     const statusGroup = content.createDiv('import-option-group')
-    statusGroup.createEl('label', { text: 'Default status' })
+    statusGroup.createEl('label', { text: t('Default status') })
 
     const statusSelect = statusGroup.createEl('select')
 
     this.palettes.statuses.forEach((s) => {
-      const option = statusSelect.createEl('option', { text: s.label })
+      const option = statusSelect.createEl('option', { text: t(s.label) })
       option.value = s.id
       if (s.id === this.defaultStatus) option.selected = true
     })
@@ -169,12 +169,12 @@ export class ImportModal extends Modal {
     })
 
     const priorityGroup = content.createDiv('import-option-group')
-    priorityGroup.createEl('label', { text: 'Default priority' })
+    priorityGroup.createEl('label', { text: t('Default priority') })
 
     const prioritySelect = priorityGroup.createEl('select')
 
     this.palettes.priorities.forEach((p) => {
-      const option = prioritySelect.createEl('option', { text: p.label })
+      const option = prioritySelect.createEl('option', { text: t(p.label) })
       option.value = p.id
       if (p.id === this.defaultPriority) option.selected = true
     })
@@ -184,7 +184,7 @@ export class ImportModal extends Modal {
     })
 
     const handlingGroup = content.createDiv('import-option-group')
-    handlingGroup.createEl('label', { text: 'File handling' })
+    handlingGroup.createEl('label', { text: t('File handling') })
 
     const radioGroup = handlingGroup.createDiv('import-radio-group')
 
@@ -198,7 +198,7 @@ export class ImportModal extends Modal {
       this.fileHandling = 'move'
     })
 
-    moveLabel.createSpan({ text: 'Move to tasks folder (default)' })
+    moveLabel.createSpan({ text: t('Move to tasks folder (default)') })
 
     const copyLabel = radioGroup.createEl('label')
 
@@ -210,13 +210,13 @@ export class ImportModal extends Modal {
       this.fileHandling = 'copy'
     })
 
-    copyLabel.createSpan({ text: 'Copy (keep original)' })
+    copyLabel.createSpan({ text: t('Copy (keep original)') })
 
     const footer = contentEl.createDiv('import-modal-footer')
 
-    new ButtonComponent(footer).setButtonText('Back').onClick(() => this.handleBack())
+    new ButtonComponent(footer).setButtonText(t('Back')).onClick(() => this.handleBack())
 
-    const importButton = new ButtonComponent(footer).setButtonText(`Import (${this.selectedCount})`).setCta()
+    const importButton = new ButtonComponent(footer).setButtonText(t(`Import (${this.selectedCount})`)).setCta()
     importButton.onClick(() => {
       void this.handleImport()
     })
@@ -282,7 +282,7 @@ export class ImportModal extends Modal {
     if (!this.counterLabel) return
     const count = this.files.filter((f) => f.selected).length
     this.selectedCount = count
-    this.counterLabel.setText(`${count} selected`)
+    this.counterLabel.setText(t(`${count} selected`))
   }
 
   private updateSelectAllCheckbox(): void {

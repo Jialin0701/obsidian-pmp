@@ -65,14 +65,14 @@ export interface PaletteEntry {
 export function renderPaletteFields(parent: HTMLElement, app: App, item: PaletteEntry, onChanged: () => void): void {
   const icon = parent.createEl('input', { type: 'text', value: item.icon })
   icon.addClass('pm-settings-status-icon')
-  icon.placeholder = 'Icon'
+  icon.placeholder = t('Icon')
   attachIconSuggest(app, icon)
   icon.addEventListener('change', () => {
     item.icon = icon.value
     onChanged()
   })
 
-  const label = parent.createEl('input', { type: 'text', value: item.label })
+  const label = parent.createEl('input', { type: 'text', value: t(item.label) })
   label.addClass('pm-settings-status-label')
   label.addEventListener('change', () => {
     item.label = label.value
@@ -91,7 +91,7 @@ export function renderStatusDoneToggle(parent: HTMLElement, status: StatusConfig
   const wrapper = parent.createEl('label', { cls: 'pm-settings-complete-toggle' })
   const checkbox = wrapper.createEl('input', { type: 'checkbox' })
   checkbox.checked = status.complete
-  wrapper.createSpan({ text: 'Done', cls: 'pm-settings-complete-text' })
+  wrapper.createSpan({ text: t('Done'), cls: 'pm-settings-complete-text' })
   checkbox.addEventListener('change', () => {
     status.complete = checkbox.checked
     onChanged()
@@ -129,7 +129,7 @@ function renderPaletteListEditor<T extends PaletteEntry>(container: HTMLElement,
 
     new IconButton(row)
       .setIcon('x')
-      .setTooltip('Remove')
+      .setTooltip(t('Remove'))
       .onClick(() => {
         if (opts.items.length <= 1) {
           new Notice(t(opts.minOneMessage))

@@ -4,14 +4,15 @@ import { svgEl } from '../../utils'
 import { Temporal } from '../../dates'
 
 import type { GanttWeekLabel } from '../../types'
+import { getDateLocale } from '../../i18n'
 
 function formatDateRange(weekStart: Temporal.PlainDate, days: number): string {
   const end = weekStart.add({ days: days - 1 })
-  const startMonth = weekStart.toLocaleString(undefined, { month: 'short' })
+  const startMonth = weekStart.toLocaleString(getDateLocale(), { month: 'short' })
   if (weekStart.month === end.month) {
     return `${startMonth} ${weekStart.day}–${end.day}`
   }
-  const endMonth = end.toLocaleString(undefined, { month: 'short' })
+  const endMonth = end.toLocaleString(getDateLocale(), { month: 'short' })
   return `${startMonth} ${weekStart.day} – ${endMonth} ${end.day}`
 }
 
@@ -135,7 +136,7 @@ function renderMonthHeader(g: SVGGElement, ctx: RendererContext): void {
       y: 44,
       class: 'pm-gantt-header-month'
     })
-    text.textContent = monthStart.toLocaleString(undefined, { month: 'short' })
+    text.textContent = monthStart.toLocaleString(getDateLocale(), { month: 'short' })
     g.appendChild(text)
     g.appendChild(
       svgEl('line', {
@@ -195,7 +196,7 @@ function renderMonthBands(g: SVGGElement, y: number, h: number, ctx: RendererCon
       y: y + h - 6,
       class: 'pm-gantt-header-month-top'
     })
-    text.textContent = monthStart.toLocaleString(undefined, { month: 'short', year: '2-digit' })
+    text.textContent = monthStart.toLocaleString(getDateLocale(), { month: 'short', year: '2-digit' })
     g.appendChild(text)
     monthStart = nextMonthStart
   }

@@ -1,4 +1,5 @@
 import { setIcon, setTooltip } from 'obsidian'
+import { t } from '../../i18n'
 
 export type ChipVariant = 'solid' | 'outline' | 'plain'
 
@@ -71,7 +72,7 @@ export class Chip {
   }
 
   setTooltip(text: string): this {
-    setTooltip(this.el, text)
+    setTooltip(this.el, t(text))
     return this
   }
 

@@ -1,6 +1,7 @@
 import { setIcon } from 'obsidian'
 import { renderAddButton } from '../addButton'
 import { Popover } from '../../primitives/Popover'
+import { t } from '../../../i18n'
 
 export interface HiddenProperty {
   id: string
@@ -16,7 +17,7 @@ export function renderAddProperty(
 ): void {
   if (hidden.length === 0) return
   let pop: Popover | null = null
-  const btn = renderAddButton(container, 'Add property', () => {
+  const btn = renderAddButton(container, t('Add property'), () => {
     if (pop?.isOpen) {
       pop.close()
       return
@@ -27,7 +28,7 @@ export function renderAddProperty(
       const item = list.createEl('button', { cls: 'pm-pop-item' })
       const ic = item.createSpan({ cls: 'pm-glyph-icon' })
       setIcon(ic, h.icon)
-      item.createSpan({ cls: 'pm-pop-item-label', text: h.label })
+      item.createSpan({ cls: 'pm-pop-item-label', text: t(h.label) })
       item.addEventListener('click', () => {
         pop?.close()
         onShow(h.id)

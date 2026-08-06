@@ -20,7 +20,7 @@ export function renderProjectListToolbar(ctx: ProjectListContext): void {
   ctx.toolbarEl.createEl('h2', { text: t('Project manager'), cls: 'pm-toolbar-title' })
 
   new ButtonComponent(ctx.toolbarEl)
-    .setButtonText('+ new project')
+    .setButtonText(t('+ new project'))
     .setCta()
     .onClick(() => openCreateProjectModal(ctx))
 }
@@ -33,9 +33,9 @@ export async function renderProjectListContent(ctx: ProjectListContext): Promise
   if (projects.length === 0) {
     new EmptyState(ctx.contentEl)
       .setIcon('📋')
-      .setTitle('No projects yet')
-      .setBody('Create your first project to get started.')
-      .setAction('+ new project', () => openCreateProjectModal(ctx))
+      .setTitle(t('No projects yet'))
+      .setBody(t('Create your first project to get started.'))
+      .setAction(t('+ new project'), () => openCreateProjectModal(ctx))
     return
   }
 
@@ -72,7 +72,7 @@ function openProjectContextMenu(ctx: ProjectListContext, project: Project, e: Mo
   const menu = new Menu()
   menu.addItem((item) =>
     item
-      .setTitle('Edit project')
+      .setTitle(t('Edit project'))
       .setIcon('settings')
       .onClick(() => {
         openProjectModal(ctx.plugin, {
@@ -85,7 +85,7 @@ function openProjectContextMenu(ctx: ProjectListContext, project: Project, e: Mo
   )
   menu.addItem((item) =>
     item
-      .setTitle('Delete project')
+      .setTitle(t('Delete project'))
       .setIcon('trash')
       .onClick(
         safeAsync(async () => {
