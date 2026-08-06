@@ -10,6 +10,7 @@ import {
   type TaskNotesTaskInfo
 } from '../integrations/tasknotes'
 import { buildImportForest, type TaskNotesImportItem } from '../integrations/tasknotesImport'
+import { t } from '../i18n'
 
 interface FileItem {
   file: TFile
@@ -308,7 +309,7 @@ export class ImportModal extends Modal {
 
   private async handleImport(): Promise<void> {
     if (!this.project) {
-      new Notice('Error: project not set for import', 5000)
+      new Notice(t('Error: project not set for import'), 5000)
       return
     }
 
@@ -360,7 +361,7 @@ export class ImportModal extends Modal {
     if (skipped > 0) {
       message += ` (${skipped} skipped)`
     }
-    new Notice(message, 3000)
+    new Notice(t(message), 3000)
 
     this.close()
   }

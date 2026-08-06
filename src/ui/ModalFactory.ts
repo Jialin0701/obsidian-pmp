@@ -5,6 +5,7 @@ import { TaskModal } from '../modals/TaskModal'
 import { ProjectModal } from '../modals/ProjectModal'
 import { ProjectPickerModal, TaskPickerModal } from '../modals/PickerModals'
 import { ImportModal } from '../modals/ImportModal'
+import { t } from '../i18n'
 
 /** Resolves true if confirmed, false if cancelled. */
 export function confirmDialog(app: App, message: string, confirmLabel = 'Delete'): Promise<boolean> {
@@ -53,19 +54,19 @@ class TextPromptModal extends Modal {
     this.modalEl.addClass('pm-prompt-modal')
 
     contentEl.createEl('p', {
-      text: this.label,
+      text: t(this.label),
       cls: 'pm-prompt-text'
     })
 
     const input = contentEl.createEl('input', {
       type: 'text',
-      placeholder: this.placeholder,
+      placeholder: t(this.placeholder),
       cls: 'pm-prompt-input'
     })
 
     const btnRow = contentEl.createDiv('pm-modal-btn-row')
 
-    new ButtonComponent(btnRow).setButtonText('Cancel').onClick(() => {
+    new ButtonComponent(btnRow).setButtonText(t('Cancel')).onClick(() => {
       this.finish(null)
       this.close()
     })
@@ -76,7 +77,7 @@ class TextPromptModal extends Modal {
       this.close()
     }
 
-    new ButtonComponent(btnRow).setButtonText('OK').setCta().onClick(submit)
+    new ButtonComponent(btnRow).setButtonText(t('OK')).setCta().onClick(submit)
 
     input.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
@@ -122,19 +123,19 @@ class ConfirmModal extends Modal {
     this.modalEl.addClass('pm-confirm-modal')
 
     contentEl.createEl('p', {
-      text: this.message,
+      text: t(this.message),
       cls: 'pm-confirm-text'
     })
 
     const btnRow = contentEl.createDiv('pm-modal-btn-row')
 
-    new ButtonComponent(btnRow).setButtonText('Cancel').onClick(() => {
+    new ButtonComponent(btnRow).setButtonText(t('Cancel')).onClick(() => {
       this.finish(false)
       this.close()
     })
 
     new ButtonComponent(btnRow)
-      .setButtonText(this.confirmLabel)
+      .setButtonText(t(this.confirmLabel))
       .setDestructive()
       .onClick(() => {
         this.finish(true)
@@ -170,24 +171,24 @@ class DuplicateSubtasksModal extends Modal {
     this.modalEl.addClass('pm-confirm-modal')
 
     contentEl.createEl('p', {
-      text: `Duplicate "${this.taskTitle}" with its subtasks?`,
+      text: t(`Duplicate "${this.taskTitle}" with its subtasks?`),
       cls: 'pm-confirm-text'
     })
 
     const btnRow = contentEl.createDiv('pm-modal-btn-row')
 
-    new ButtonComponent(btnRow).setButtonText('Cancel').onClick(() => {
+    new ButtonComponent(btnRow).setButtonText(t('Cancel')).onClick(() => {
       this.finish(null)
       this.close()
     })
 
-    new ButtonComponent(btnRow).setButtonText('Task only').onClick(() => {
+    new ButtonComponent(btnRow).setButtonText(t('Task only')).onClick(() => {
       this.finish('task-only')
       this.close()
     })
 
     new ButtonComponent(btnRow)
-      .setButtonText('With subtasks')
+      .setButtonText(t('With subtasks'))
       .setCta()
       .onClick(() => {
         this.finish('with-subtasks')

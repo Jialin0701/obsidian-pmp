@@ -6,6 +6,7 @@ export type TaskPriority = string
 export type GanttGranularity = 'day' | 'week' | 'month' | 'quarter'
 export type GanttWeekLabel = 'weekNumber' | 'dateRange' | 'both'
 export type ViewMode = 'table' | 'gantt' | 'kanban'
+export type Language = 'auto' | 'en' | 'zh'
 export type DueDateFilter = 'any' | 'overdue' | 'this-week' | 'this-month' | 'no-date'
 export type TaskType = 'task' | 'milestone' | 'subtask'
 
@@ -145,6 +146,7 @@ export interface PriorityConfig {
 }
 
 export interface PMSettings {
+  language: Language
   projectsFolder: string
   defaultView: ViewMode
   ganttGranularity: GanttGranularity
@@ -182,6 +184,7 @@ export const DEFAULT_PRIORITIES: PriorityConfig[] = [
 ]
 
 export const DEFAULT_SETTINGS: PMSettings = {
+  language: 'auto',
   projectsFolder: 'Projects',
   defaultView: 'table',
   ganttGranularity: 'week',

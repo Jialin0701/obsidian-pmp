@@ -1,5 +1,5 @@
 import { MarkdownView, Plugin, Notice } from 'obsidian'
-import { DEFAULT_SETTINGS, type PMSettings, type Project, type Task } from './types'
+import { DEFAULT_SETTINGS, type Language, type PMSettings, type Project, type Task } from './types'
 import { flattenTasks, findTask } from './store/TaskTreeOps'
 import { ProjectStore } from './store'
 import type { TaskSource } from './store'
@@ -12,6 +12,7 @@ import { openProjectModal, openTaskModal, openProjectPicker, openTaskPicker, ope
 import { Notifier } from './components/Notifier'
 import { migrateProjects } from './migration'
 import { safeAsync } from './utils'
+import { observeTranslations, setLanguage as setActiveLanguage, t, translateElementTree } from './i18n'
 
 export default class PMPlugin extends Plugin {
   settings: PMSettings = { ...DEFAULT_SETTINGS }
@@ -20,6 +21,7 @@ export default class PMPlugin extends Plugin {
   router!: PMViewRouter
   undoStack: Array<{ undo: () => Promise<void>; redo: () => Promise<void> }> = []
   redoStack: Array<{ undo: () => Promise<void>; redo: () => Promise<void> }> = []
+  private languageObserver: MutationObserver | null = null
 
   pushUndo(entry: { undo: () => Promise<void>; redo: () => Promise<void> }): void {
     this.undoStack.push(entry)
@@ -45,6 +47,11 @@ export default class PMPlugin extends Plugin {
 
   async onload(): Promise<void> {
     await this.loadSettings()
+    setActiveLanguage(this.settings.language)
+    if (typeof activeDocument !== 'undefined' && activeDocument.body) {
+      this.languageObserver = observeTranslations(activeDocument.body)
+      if (this.languageObserver) this.register(() => this.languageObserver?.disconnect())
+    }
     this.store = new ProjectStore(this.app, () => this.settings)
     this.store.registerVaultSync(this)
     this.notifier = new Notifier(this)
@@ -61,13 +68,13 @@ export default class PMPlugin extends Plugin {
       })
     )
 
-    this.addRibbonIcon('chart-gantt', 'Project manager', async () => {
+    this.addRibbonIcon('chart-gantt', t('Project manager'), async () => {
       await this.router.openDashboard()
     })
 
     this.addCommand({
       id: 'open-projects',
-      name: 'Open projects pane',
+      name: t('Open projects pane'),
       callback: () => {
         void this.router.openDashboard()
       }
@@ -75,7 +82,7 @@ export default class PMPlugin extends Plugin {
 
     this.addCommand({
       id: 'new-project',
-      name: 'Create new project',
+      name: t('Create new project'),
       callback: () => {
         openProjectModal(this, {
           onSave: async (project) => {
@@ -87,7 +94,7 @@ export default class PMPlugin extends Plugin {
 
     this.addCommand({
       id: 'new-task',
-      name: 'Create new task',
+      name: t('Create new task'),
       callback: () => {
         void this.pickProjectThenCreateTask(null)
       }
@@ -95,7 +102,7 @@ export default class PMPlugin extends Plugin {
 
     this.addCommand({
       id: 'new-subtask',
-      name: 'Create new subtask',
+      name: t('Create new subtask'),
       callback: () => {
         void this.pickProjectThenCreateTask('pick-parent')
       }
@@ -103,7 +110,7 @@ export default class PMPlugin extends Plugin {
 
     this.addCommand({
       id: 'undo-last-action',
-      name: 'Undo last action',
+      name: t('Undo last action'),
       callback: () => {
         void this.undoLastAction()
       }
@@ -111,7 +118,7 @@ export default class PMPlugin extends Plugin {
 
     this.addCommand({
       id: 'redo-last-action',
-      name: 'Redo last action',
+      name: t('Redo last action'),
       callback: () => {
         void this.redoLastAction()
       }
@@ -119,7 +126,7 @@ export default class PMPlugin extends Plugin {
 
     this.addCommand({
       id: 'import-notes-as-tasks',
-      name: 'Import notes as tasks',
+      name: t('Import notes as tasks'),
       callback: () => {
         void this.importNotes()
       }
@@ -127,7 +134,7 @@ export default class PMPlugin extends Plugin {
 
     this.addCommand({
       id: 'create-task-from-selection',
-      name: 'Create task from selection',
+      name: t('Create task from selection'),
       editorCheckCallback: (checking, editor) => {
         const selection = editor.getSelection().trim()
         if (!selection) return false
@@ -143,7 +150,7 @@ export default class PMPlugin extends Plugin {
         if (!selection) return
         menu.addItem((item) =>
           item
-            .setTitle('Create task from selection')
+            .setTitle(t('Create task from selection'))
             .setIcon('list-plus')
             .onClick(() => void this.createTaskFromText(selection))
         )
@@ -152,7 +159,7 @@ export default class PMPlugin extends Plugin {
 
     this.addCommand({
       id: 'open-current-as-project',
-      name: 'Open current file as project',
+      name: t('Open current file as project'),
       checkCallback: (checking: boolean) => {
         const md = this.app.workspace.getActiveViewOfType(MarkdownView)
         const file = md?.file
@@ -176,6 +183,7 @@ export default class PMPlugin extends Plugin {
   async loadSettings(): Promise<void> {
     const saved = (await this.loadData()) as Partial<PMSettings> | null
     this.settings = Object.assign({}, DEFAULT_SETTINGS, saved ?? {})
+    if (!['auto', 'en', 'zh'].includes(this.settings.language)) this.settings.language = 'auto'
     if (!saved?.statuses?.length) this.settings.statuses = DEFAULT_SETTINGS.statuses
     if (!saved?.priorities?.length) this.settings.priorities = DEFAULT_SETTINGS.priorities
     if (!this.settings.projectFilters) this.settings.projectFilters = {}
@@ -261,7 +269,20 @@ export default class PMPlugin extends Plugin {
   }
 
   showNotice(msg: string, duration = 3000): void {
-    new Notice(msg, duration)
+    new Notice(t(msg), duration)
+  }
+
+  /** Change the interface language and refresh all open plugin views. */
+  setLanguage(language: Language): void {
+    this.settings.language = language
+    setActiveLanguage(language)
+    if (typeof activeDocument !== 'undefined' && activeDocument.body) translateElementTree(activeDocument.body)
+    for (const leaf of this.app.workspace.getLeavesOfType(PM_DASHBOARD_VIEW_TYPE)) {
+      if (leaf.view instanceof DashboardView) leaf.view.render()
+    }
+    for (const leaf of this.app.workspace.getLeavesOfType(PM_PROJECT_VIEW_TYPE)) {
+      if (leaf.view instanceof ProjectView) leaf.view.refreshLocalizedUi()
+    }
   }
 
   /** For changes the store's own events don't cover, such as a settings edit. */

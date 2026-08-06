@@ -1,6 +1,7 @@
 import { AbstractInputSuggest, App, Notice, getIconIds, setIcon } from 'obsidian'
 import type { PriorityConfig, StatusConfig } from '../types'
 import { IconButton } from './primitives/IconButton'
+import { t } from '../i18n'
 
 /** Typed emoji are kept as-is; only Lucide ids are suggested. */
 class IconSuggest extends AbstractInputSuggest<string> {
@@ -131,7 +132,7 @@ function renderPaletteListEditor<T extends PaletteEntry>(container: HTMLElement,
       .setTooltip('Remove')
       .onClick(() => {
         if (opts.items.length <= 1) {
-          new Notice(opts.minOneMessage)
+          new Notice(t(opts.minOneMessage))
           return
         }
         opts.items.splice(i, 1)

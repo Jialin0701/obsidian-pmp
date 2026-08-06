@@ -9,6 +9,7 @@ import type { SortKey, SortDir, TableState } from './TableRenderer'
 import { updateSelectAllCheckbox } from './TableRow'
 import { renderBulkActionBar } from './BulkActionBar'
 import type { BulkAction } from './BulkActionBar'
+import { t } from '../../i18n'
 
 const taskCount = (n: number) => `${n} task${n === 1 ? '' : 's'}`
 
@@ -139,23 +140,23 @@ export class TableView implements SubView {
           break
         case 'set-parent':
           await this.plugin.store.moveTasks(this.project, ids, action.parentId)
-          new Notice(`Moved ${taskCount(ids.length)} under new parent`)
+          new Notice(t(`Moved ${taskCount(ids.length)} under new parent`))
           break
         case 'remove-parent':
           await this.plugin.store.moveTasks(this.project, ids, null)
-          new Notice(`Moved ${taskCount(ids.length)} to top level`)
+          new Notice(t(`Moved ${taskCount(ids.length)} to top level`))
           break
         case 'archive':
           for (const id of ids) {
             await this.plugin.store.archiveTask(this.project, id)
           }
-          new Notice(`Archived ${taskCount(ids.length)}`)
+          new Notice(t(`Archived ${taskCount(ids.length)}`))
           break
         case 'unarchive':
           for (const id of ids) {
             await this.plugin.store.unarchiveTask(this.project, id)
           }
-          new Notice(`Unarchived ${taskCount(ids.length)}`)
+          new Notice(t(`Unarchived ${taskCount(ids.length)}`))
           break
         case 'delete':
           if (!(await confirmDialog(this.plugin.app, `Delete ${taskCount(ids.length)}? This cannot be undone.`))) {
@@ -168,7 +169,7 @@ export class TableView implements SubView {
       await this.onRefresh()
     } catch (err) {
       console.error('Bulk action failed', err)
-      new Notice('Bulk action failed. Please try again.')
+      new Notice(t('Bulk action failed. Please try again.'))
       await this.onRefresh()
     }
   }

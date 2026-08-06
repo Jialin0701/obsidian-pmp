@@ -10,6 +10,7 @@ import { KanbanView } from './KanbanView'
 import { openProjectModal, openTaskModal } from '../ui/ModalFactory'
 import { ViewSwitcher } from '../ui/primitives/ViewSwitcher'
 import { ProjectHeader } from '../ui/composites/ProjectHeader'
+import { t } from '../i18n'
 
 export const PM_PROJECT_VIEW_TYPE = 'pm-project'
 
@@ -49,7 +50,7 @@ export class ProjectView extends ItemView {
     return PM_PROJECT_VIEW_TYPE
   }
   getDisplayText(): string {
-    return truncateTitle(this.project?.title ?? 'Project', 10)
+    return truncateTitle(this.project?.title ?? t('Project'), 10)
   }
   getIcon(): string {
     return 'chart-gantt'
@@ -437,5 +438,13 @@ export class ProjectView extends ItemView {
       }, 0)
     })
     return this.pendingRefresh
+  }
+
+  /** Rebuild static UI labels after the interface language changes. */
+  refreshLocalizedUi(): void {
+    if (!this.project) return
+    this.renderProjectToolbar()
+    this.renderProjectHeader()
+    this.renderCurrentView()
   }
 }

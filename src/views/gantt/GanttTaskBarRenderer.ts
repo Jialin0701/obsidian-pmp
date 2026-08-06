@@ -16,6 +16,7 @@ import {
 import { attachDragHandle, attachBarMove } from './GanttDragHandler'
 import { handleLinkDotClick } from './GanttLinkHandler'
 import type { RendererContext } from './GanttRenderer'
+import { t } from '../../i18n'
 
 export function renderTaskBar(g: SVGGElement, task: Task, row: number, _depth: number, ctx: RendererContext): void {
   const startDate = parsePlainDate(task.start)
@@ -252,7 +253,7 @@ function renderEmptyRowClickTarget(g: SVGGElement, task: Task, row: number, ctx:
       try {
         await ctx.plugin.store.updateTask(ctx.project, task.id, { start: iso, due: iso })
       } catch (err) {
-        new Notice('Failed to set task dates. Please try again.')
+        new Notice(t('Failed to set task dates. Please try again.'))
         console.error('GanttTaskBarRenderer: click-to-set-dates failed', err)
         return
       }

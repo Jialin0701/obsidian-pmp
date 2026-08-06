@@ -1,7 +1,7 @@
 import { App, Notice, PluginSettingTab, Setting } from 'obsidian'
 import type { SettingDefinitionItem, SettingDefinitionPage } from 'obsidian'
 import type PMPlugin from './main'
-import { type PMSettings, DEFAULT_SETTINGS, makeId } from './types'
+import { type Language, type PMSettings, DEFAULT_SETTINGS, makeId } from './types'
 import { flattenTasks } from './store/TaskTreeOps'
 import {
   countTaskNotesPaletteChanges,
@@ -10,6 +10,7 @@ import {
   isTaskNotesInstalled
 } from './integrations/tasknotes'
 import { renderPaletteFields, renderStatusDoneToggle } from './ui/PaletteListEditor'
+import { t, translateElementTree } from './i18n'
 
 export type { PMSettings }
 export { DEFAULT_SETTINGS }
@@ -33,6 +34,15 @@ export class PMSettingTab extends PluginSettingTab {
         type: 'group',
         heading: 'General',
         items: [
+          {
+            name: t('Language'),
+            desc: t('Choose the interface language.'),
+            control: {
+              type: 'dropdown',
+              key: 'language',
+              options: { auto: t('Auto'), en: t('English'), zh: t('Chinese') }
+            }
+          },
           {
             name: 'Projects folder',
             desc: 'Vault folder where project files are stored.',
@@ -183,6 +193,12 @@ export class PMSettingTab extends PluginSettingTab {
 
   async setControlValue(key: string, value: unknown): Promise<void> {
     await super.setControlValue(key, value)
+    if (key === 'language') {
+      this.plugin.setLanguage(value as Language)
+      this.update()
+      window.setTimeout(() => translateElementTree(this.containerEl), 0)
+      return
+    }
     if (key === 'kanbanShowDescriptionPreview') this.plugin.refreshProjectViews()
     this.refreshDomState()
   }
@@ -369,7 +385,7 @@ export class PMSettingTab extends PluginSettingTab {
   private deleteEntry(field: 'status' | 'priority', index: number): void {
     const entries = field === 'status' ? this.plugin.settings.statuses : this.plugin.settings.priorities
     if (entries.length <= 1) {
-      new Notice(`You must have at least one ${field}.`)
+      new Notice(t(`You must have at least one ${field}.`))
       return
     }
     const [removed] = entries.splice(index, 1)
@@ -381,7 +397,7 @@ export class PMSettingTab extends PluginSettingTab {
   private importFromTaskNotes(): void {
     const api = getTaskNotesApi(this.app)
     if (!api) {
-      new Notice('TaskNotes 4.10 or newer is required.')
+      new Notice(t('TaskNotes 4.10 or newer is required.'))
       return
     }
     const { added, updated } = importTaskNotesPalettes(api, this.plugin.settings)
@@ -389,8 +405,8 @@ export class PMSettingTab extends PluginSettingTab {
     this.update()
     new Notice(
       added || updated
-        ? `Imported from TaskNotes: ${added} added, ${updated} updated.`
-        : 'Statuses and priorities already match TaskNotes.'
+        ? t(`Imported from TaskNotes: ${added} added, ${updated} updated.`)
+        : t('Statuses and priorities already match TaskNotes.')
     )
   }
 
@@ -414,7 +430,9 @@ export class PMSettingTab extends PluginSettingTab {
       }
     }
     if (remapped > 0) {
-      new Notice(`Remapped ${remapped} task${remapped === 1 ? '' : 's'} from '${deletedLabel}' to '${fallback.label}'.`)
+      new Notice(
+        t(`Remapped ${remapped} task${remapped === 1 ? '' : 's'} from '${deletedLabel}' to '${fallback.label}'.`)
+      )
     }
   }
 }

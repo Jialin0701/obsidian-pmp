@@ -3,6 +3,7 @@ import type PMPlugin from '../main'
 import type { Task, Project } from '../types'
 import { safeAsync } from '../utils'
 import { openTaskModal, confirmDialog, confirmDuplicateSubtasks } from './ModalFactory'
+import { t } from '../i18n'
 
 export interface TaskMenuContext {
   plugin: PMPlugin
@@ -64,7 +65,7 @@ export function buildTaskContextMenu(menu: Menu, task: Task, ctx: TaskMenuContex
         .onClick(
           safeAsync(async () => {
             await ctx.plugin.store.unarchiveTask(ctx.project, task.id)
-            new Notice('Task unarchived')
+            new Notice(t('Task unarchived'))
             await ctx.onRefresh()
           })
         )
@@ -77,7 +78,7 @@ export function buildTaskContextMenu(menu: Menu, task: Task, ctx: TaskMenuContex
         .onClick(
           safeAsync(async () => {
             await ctx.plugin.store.archiveTask(ctx.project, task.id)
-            new Notice('Task archived')
+            new Notice(t('Task archived'))
             await ctx.onRefresh()
           })
         )

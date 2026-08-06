@@ -1,4 +1,5 @@
 import { Notice } from 'obsidian'
+import { t } from './i18n'
 import type PMPlugin from './main'
 import { parseFrontmatter, isOldFormat } from './store/YamlParser'
 
@@ -21,17 +22,17 @@ export async function migrateProjects(plugin: PMPlugin): Promise<void> {
       const project = await plugin.store.loadProject(file)
       if (!project || project.tasks.length === 0) continue
 
-      new Notice(`Migrating project: ${project.title}...`)
+      new Notice(t(`Migrating project: ${project.title}...`))
 
       await plugin.store.saveProject(project)
       migrated++
     } catch (e) {
       console.error(`[PM] Migration failed for ${file.path}:`, e)
-      new Notice(`Project Manager: Migration failed for "${file.basename}". Check console for details.`)
+      new Notice(t(`Project Manager: Migration failed for "${file.basename}". Check console for details.`))
     }
   }
 
   if (migrated > 0) {
-    new Notice(`Project Manager: Migrated ${migrated} project(s) to new format.`)
+    new Notice(t(`Project Manager: Migrated ${migrated} project(s) to new format.`))
   }
 }

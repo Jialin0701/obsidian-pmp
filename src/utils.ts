@@ -2,6 +2,7 @@ import { Notice, setIcon } from 'obsidian'
 import type { Task, StatusConfig, PriorityConfig, TaskPriority } from './types'
 import type { DueUrgency } from './ui/composites/dueChip'
 import { today, parsePlainDate } from './dates'
+import { getDateLocale, t } from './i18n'
 
 export function stringToColor(s: string): string {
   let hash = 0
@@ -13,14 +14,14 @@ export function stringToColor(s: string): string {
 export function formatDateShort(iso: string): string {
   if (!iso) return ''
   const d = new Date(iso)
-  return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
+  return d.toLocaleDateString(getDateLocale(), { month: 'short', day: 'numeric' })
 }
 
 /** "Mar 28, '26" */
 export function formatDateLong(iso: string): string {
   if (!iso) return ''
   const d = new Date(iso)
-  return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: '2-digit' })
+  return d.toLocaleDateString(getDateLocale(), { month: 'short', day: 'numeric', year: '2-digit' })
 }
 
 export function isTerminalStatus(status: string, statuses: StatusConfig[]): boolean {
@@ -109,7 +110,7 @@ export function safeAsync<A extends unknown[]>(fn: (...args: A) => Promise<void>
         await fn(...args)
       } catch (err: unknown) {
         console.error('[PM]', err)
-        new Notice('Something went wrong. Check the console for details.')
+        new Notice(t('Something went wrong. Check the console for details.'))
       }
     })()
   }

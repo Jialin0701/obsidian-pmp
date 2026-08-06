@@ -20,6 +20,7 @@ import { renderTaskFormFields } from './TaskFormFields'
 import { renderTimeTrackingPanel } from './TimeTrackingPanel'
 import { renderSubtasksPanel } from './SubtasksPanel'
 import { NoteLinkSuggest } from './NoteLinkSuggest'
+import { t } from '../i18n'
 
 export class TaskModal extends Modal {
   private task: Task
@@ -84,7 +85,7 @@ export class TaskModal extends Modal {
     ) {
       const conflict = this.plugin.store.findTaskFileConflict(this.project, this.task)
       if (conflict) {
-        new Notice(`Task not saved: a note named "${conflict.fileName}" already exists.`)
+        new Notice(t(`Task not saved: a note named "${conflict.fileName}" already exists.`))
       } else {
         void this.persistTask()
       }
@@ -127,7 +128,7 @@ export class TaskModal extends Modal {
         autoResize()
       } catch (err) {
         console.error('Failed to save attachment', err)
-        new Notice('Failed to save attachment')
+        new Notice(t('Failed to save attachment'))
       }
     }
   }
@@ -185,7 +186,7 @@ export class TaskModal extends Modal {
           .onClick(
             safeAsync(async () => {
               await this.plugin.store.unarchiveTask(this.project, this.task.id)
-              new Notice('Task unarchived')
+              new Notice(t('Task unarchived'))
               await this.onSave(this.task)
               this.cancelled = true
               this.close()
@@ -200,7 +201,7 @@ export class TaskModal extends Modal {
           .onClick(
             safeAsync(async () => {
               await this.plugin.store.archiveTask(this.project, this.task.id)
-              new Notice('Task archived')
+              new Notice(t('Task archived'))
               await this.onSave(this.task)
               this.cancelled = true
               this.close()
@@ -251,7 +252,7 @@ export class TaskModal extends Modal {
       'click',
       safeAsync(async () => {
         await navigator.clipboard.writeText(this.task.id)
-        new Notice('Copied task ID')
+        new Notice(t('Copied task ID'))
       })
     )
 
@@ -545,7 +546,7 @@ export class TaskModal extends Modal {
         'click',
         safeAsync(async () => {
           await navigator.clipboard.writeText(filePath)
-          new Notice('Copied file path')
+          new Notice(t('Copied file path'))
         })
       )
     }
@@ -580,7 +581,7 @@ export class TaskModal extends Modal {
           return
         }
         console.error('[PM]', err)
-        new Notice('Something went wrong. Check the console for details.')
+        new Notice(t('Something went wrong. Check the console for details.'))
       } finally {
         saving = false
       }

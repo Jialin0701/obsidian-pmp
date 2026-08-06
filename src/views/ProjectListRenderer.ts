@@ -5,6 +5,7 @@ import { safeAsync, isTerminalStatus } from '../utils'
 import { openProjectModal } from '../ui/ModalFactory'
 import { EmptyState } from '../ui/primitives/EmptyState'
 import { ProjectCard } from '../ui/composites/ProjectCard'
+import { t } from '../i18n'
 
 export interface ProjectListContext {
   plugin: PMPlugin
@@ -16,7 +17,7 @@ export interface ProjectListContext {
 
 export function renderProjectListToolbar(ctx: ProjectListContext): void {
   ctx.toolbarEl.empty()
-  ctx.toolbarEl.createEl('h2', { text: 'Project manager', cls: 'pm-toolbar-title' })
+  ctx.toolbarEl.createEl('h2', { text: t('Project manager'), cls: 'pm-toolbar-title' })
 
   new ButtonComponent(ctx.toolbarEl)
     .setButtonText('+ new project')
