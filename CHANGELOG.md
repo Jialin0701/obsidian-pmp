@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.9.1] - 2026-08-07
+
+### Fixed
+
+- Chinese now covers project creation and editing, task fields, pickers, filters, bulk actions, table and board labels, Gantt controls and tooltips, import results, confirmations, and error messages
+- Default status, priority, task-type, recurrence, and date labels now follow the selected interface language
+- Gantt month and date labels now use the selected interface locale instead of the operating system language
+- Dynamic counters, import summaries, move results, reminders, and file-operation errors now render as complete Chinese sentences
+- The one-off `1.9.0` asset attachment workflow no longer overwrites an older release when `develop` is pushed
+
 ## [1.9.0] - 2026-08-06
 
 ### Added
