@@ -10,7 +10,6 @@ permissions:
 
 jobs:
   attach:
-    if: github.event.head_commit.message == 'chore: attach release assets'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
