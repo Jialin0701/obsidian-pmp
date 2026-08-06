@@ -21,6 +21,13 @@ export function hydrateSavedViews(raw: unknown[]): SavedView[] {
       const viewMode = v.viewMode
       const validViewMode: ViewMode | undefined =
         viewMode === 'table' || viewMode === 'gantt' || viewMode === 'kanban' ? viewMode : undefined
+      const rawWidths = v.tableColumnWidths && typeof v.tableColumnWidths === 'object' ? v.tableColumnWidths : null
+      const tableColumnWidths: Record<string, number> | undefined = rawWidths
+        ? Object.entries(rawWidths as Record<string, unknown>).reduce<Record<string, number>>((out, [id, width]) => {
+            if (typeof width === 'number' && Number.isFinite(width)) out[id] = width
+            return out
+          }, {})
+        : undefined
       return {
         id: (v.id as string) ?? '',
         name: (v.name as string) ?? 'Untitled',
@@ -35,6 +42,10 @@ export function hydrateSavedViews(raw: unknown[]): SavedView[] {
         },
         sortKey: (v.sortKey as string) ?? 'status',
         sortDir: (v.sortDir as 'asc' | 'desc') ?? 'asc',
+        ...(Array.isArray(v.tableColumns)
+          ? { tableColumns: v.tableColumns.filter((id): id is string => typeof id === 'string') }
+          : {}),
+        ...(tableColumnWidths ? { tableColumnWidths } : {}),
         ...(validViewMode ? { viewMode: validViewMode } : {})
       }
     })

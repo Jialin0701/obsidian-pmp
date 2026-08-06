@@ -90,19 +90,31 @@ export class ProjectModal extends Modal {
       cls: 'pm-modal-heading'
     })
 
+    const preview = el.createDiv('pm-project-preview')
+    const previewIcon = preview.createSpan({ cls: 'pm-project-preview-icon' })
+    const previewCopy = preview.createDiv('pm-project-preview-copy')
+    previewCopy.createSpan({ text: t('Project preview'), cls: 'pm-project-preview-label' })
+    const previewTitle = previewCopy.createEl('strong', { cls: 'pm-project-preview-title' })
+    const previewDescription = previewCopy.createSpan({ cls: 'pm-project-preview-description' })
+    const previewBar = preview.createSpan({ cls: 'pm-project-preview-bar' })
+
     const topRow = el.createDiv('pm-project-top-row')
 
     const iconWrap = topRow.createDiv('pm-icon-picker')
     const iconBtn = iconWrap.createEl('button', { text: this.draft.icon, cls: 'pm-icon-picker-btn' })
+    iconBtn.setAttribute('aria-label', t('Select icon'))
+    iconBtn.setAttribute('aria-haspopup', 'true')
 
     const iconGrid = iconWrap.createDiv('pm-icon-grid')
     iconGrid.addClass('pm-hidden')
     for (const emoji of PROJECT_ICONS) {
       const btn = iconGrid.createEl('button', { text: emoji, cls: 'pm-icon-option' })
+      btn.setAttribute('aria-label', `${t('Select icon')}: ${emoji}`)
       btn.addEventListener('click', () => {
         this.draft.icon = emoji
         iconBtn.textContent = emoji
         iconGrid.addClass('pm-hidden')
+        renderPreview()
       })
     }
     iconBtn.addEventListener('click', () => {
@@ -116,6 +128,8 @@ export class ProjectModal extends Modal {
       value: this.draft.title,
       cls: 'pm-input pm-input--lg'
     })
+    titleInput.required = true
+    titleInput.setAttribute('aria-required', 'true')
     titleInput.placeholder = t('My awesome project')
     titleInput.addEventListener('input', () => {
       this.draft.title = titleInput.value
@@ -130,20 +144,30 @@ export class ProjectModal extends Modal {
     const colorPalette = colorSection.createDiv('pm-color-palette')
     for (const color of PROJECT_COLORS) {
       const swatch = colorPalette.createEl('button', { cls: 'pm-color-swatch' })
+      swatch.setAttribute('aria-label', `${t('Color')}: ${color}`)
+      swatch.setAttribute('aria-pressed', String(color === this.draft.color))
       swatch.setCssStyles({ background: color })
       if (color === this.draft.color) swatch.addClass('pm-color-swatch--selected')
       swatch.addEventListener('click', () => {
         this.draft.color = color
         colorPalette.querySelectorAll('.pm-color-swatch').forEach((s) => s.removeClass('pm-color-swatch--selected'))
+        colorPalette.querySelectorAll('.pm-color-swatch').forEach((s) => s.setAttribute('aria-pressed', 'false'))
         swatch.addClass('pm-color-swatch--selected')
+        swatch.setAttribute('aria-pressed', 'true')
+        renderPreview()
       })
     }
     const customColor = colorPalette.createEl('input', { type: 'color', cls: 'pm-color-custom' })
     customColor.value = this.draft.color
     customColor.title = t('Custom color')
+    customColor.setAttribute('aria-label', t('Custom color'))
     customColor.addEventListener('change', () => {
       this.draft.color = customColor.value
-      colorPalette.querySelectorAll('.pm-color-swatch').forEach((s) => s.removeClass('pm-color-swatch--selected'))
+      colorPalette.querySelectorAll('.pm-color-swatch').forEach((s) => {
+        s.removeClass('pm-color-swatch--selected')
+        s.setAttribute('aria-pressed', 'false')
+      })
+      renderPreview()
     })
 
     const descSection = el.createDiv('pm-project-modal-section')
@@ -153,7 +177,17 @@ export class ProjectModal extends Modal {
     descArea.value = this.draft.description
     descArea.addEventListener('input', () => {
       this.draft.description = descArea.value
+      renderPreview()
     })
+
+    const renderPreview = () => {
+      previewIcon.setText(iconBtn.textContent || '📋')
+      previewTitle.setText(titleInput.value.trim() || t('New project'))
+      previewDescription.setText(descArea.value.trim() || t('No description'))
+      previewBar.setCssStyles({ background: this.draft.color })
+    }
+    titleInput.addEventListener('input', renderPreview)
+    renderPreview()
 
     const memberSection = el.createDiv('pm-modal-section')
     memberSection.createEl('label', { text: t('Team members'), cls: 'pm-label' })
@@ -216,7 +250,12 @@ export class ProjectModal extends Modal {
     }
     renderCFs()
 
-    this.renderPaletteOverride(el, {
+    const advanced = el.createEl('details', { cls: 'pm-project-advanced' })
+    advanced.open = !this.isNew
+    advanced.createEl('summary', { text: t('Advanced settings'), cls: 'pm-project-advanced-summary' })
+    const advancedBody = advanced.createDiv('pm-project-advanced-body')
+
+    this.renderPaletteOverride(advancedBody, {
       heading: t('Statuses'),
       hint: t('The workflow for this project'),
       toggleLabel: t('Use custom statuses instead of the global ones'),
@@ -240,7 +279,7 @@ export class ProjectModal extends Modal {
         })
     })
 
-    this.renderPaletteOverride(el, {
+    this.renderPaletteOverride(advancedBody, {
       heading: t('Priorities'),
       hint: t('The priority scale for this project'),
       toggleLabel: t('Use custom priorities instead of the global ones'),
@@ -262,7 +301,7 @@ export class ProjectModal extends Modal {
         })
     })
 
-    const behaviorSection = el.createDiv('pm-modal-section')
+    const behaviorSection = advancedBody.createDiv('pm-modal-section')
     const behaviorHeader = behaviorSection.createDiv('pm-modal-section-header')
     behaviorHeader.createSpan({ text: t('View & scheduling'), cls: 'pm-modal-subheading' })
     behaviorHeader.createSpan({ text: t('Overrides for this project'), cls: 'pm-modal-hint' })

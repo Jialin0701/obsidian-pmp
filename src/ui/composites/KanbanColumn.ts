@@ -64,6 +64,10 @@ export class KanbanColumn {
     const cardsEl = col.createDiv('pm-kanban-cards')
     cardsEl.dataset.status = props.status.id
 
+    if (props.cards.length === 0) {
+      cardsEl.createDiv({ cls: 'pm-kanban-empty', text: t('Drag tasks here') })
+    }
+
     for (const card of props.cards) {
       new KanbanCard(cardsEl, {
         task: card.task,

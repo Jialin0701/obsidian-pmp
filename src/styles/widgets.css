@@ -97,7 +97,7 @@
 
 .pm-gantt-drag-handle {
   fill: rgba(255, 255, 255, 0.08);
-  opacity: 0;
+  opacity: 0.35;
   transition:
     opacity 0.15s,
     fill 0.15s;
@@ -117,14 +117,14 @@
   fill: transparent;
   stroke: var(--interactive-accent);
   stroke-width: 1.5;
-  opacity: 0;
+  opacity: 0.4;
   transition:
     opacity 0.15s,
     fill 0.15s;
   pointer-events: all;
 }
 .pm-gantt-bar-group:hover .pm-gantt-link-dot {
-  opacity: 0.5;
+  opacity: 0.75;
 }
 .pm-gantt-bar-group .pm-gantt-link-dot:hover {
   opacity: 1;
@@ -144,6 +144,11 @@
 }
 .pm-gantt-milestone:hover {
   filter: brightness(1.2);
+}
+.pm-gantt-milestone:focus-visible {
+  outline: none;
+  stroke: var(--interactive-accent);
+  stroke-width: 2;
 }
 .pm-gantt-milestone-label {
   font-size: 10px;

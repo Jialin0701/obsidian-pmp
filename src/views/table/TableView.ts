@@ -4,7 +4,13 @@ import type PMPlugin from '../../main'
 import type { Project, FilterState } from '../../types'
 import { safeAsync } from '../../utils'
 import type { SubView } from '../SubView'
-import { renderTable, refreshTableBody, handleTableKeyDown, ROW_HEIGHT_ESTIMATE } from './TableRenderer'
+import {
+  renderTable,
+  refreshTableBody,
+  handleTableKeyDown,
+  ROW_HEIGHT_ESTIMATE,
+  defaultTableColumnIds
+} from './TableRenderer'
 import type { SortKey, SortDir, TableState } from './TableRenderer'
 import { updateSelectAllCheckbox } from './TableRow'
 import { renderBulkActionBar } from './BulkActionBar'
@@ -16,6 +22,8 @@ const taskCount = (n: number) => `${n} task${n === 1 ? '' : 's'}`
 export interface TableViewState {
   sortKey: SortKey
   sortDir: SortDir
+  columns?: string[]
+  columnWidths?: Record<string, number>
 }
 
 export class TableView implements SubView {
@@ -44,7 +52,9 @@ export class TableView implements SubView {
       heightCalibrated: false,
       windowStart: -1,
       windowEnd: -1,
-      renderWindow: null
+      renderWindow: null,
+      columns: initialState?.columns ?? defaultTableColumnIds(project),
+      columnWidths: initialState?.columnWidths ?? {}
     }
   }
 
@@ -60,7 +70,9 @@ export class TableView implements SubView {
   getViewState(): TableViewState {
     return {
       sortKey: this.state.sortKey,
-      sortDir: this.state.sortDir
+      sortDir: this.state.sortDir,
+      columns: [...this.state.columns],
+      columnWidths: { ...this.state.columnWidths }
     }
   }
 
@@ -199,7 +211,11 @@ export class TableView implements SubView {
         updateSelectAllCheckbox(this.state)
         this.updateBulkBar()
       },
-      onBulkDelete: safeAsync(() => this.handleBulkAction({ type: 'delete' }))
+      onBulkDelete: safeAsync(() => this.handleBulkAction({ type: 'delete' })),
+      onLayoutChange: () => {
+        this.pendingScrollTop = this.getScrollTop()
+        this.render()
+      }
     }
   }
 }

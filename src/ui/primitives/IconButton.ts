@@ -17,7 +17,9 @@ export class IconButton {
   }
 
   setTooltip(text: string): this {
-    this.button.setTooltip(t(text))
+    const label = t(text)
+    this.button.setTooltip(label)
+    this.el.setAttribute('aria-label', label)
     return this
   }
 

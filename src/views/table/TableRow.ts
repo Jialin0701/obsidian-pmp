@@ -18,6 +18,7 @@ import { SelectCell } from '../../ui/composites/cells/SelectCell'
 import { StatusCell } from '../../ui/composites/cells/StatusCell'
 import { TimeCell } from '../../ui/composites/cells/TimeCell'
 import { TitleCell } from '../../ui/composites/cells/TitleCell'
+import { t } from '../../i18n'
 
 export function renderTaskRow(tbody: HTMLElement, task: Task, depth: number, ctx: TableContext): void {
   const isDone = isTerminalStatus(task.status, ctx.statuses)
@@ -35,7 +36,9 @@ export function renderTaskRow(tbody: HTMLElement, task: Task, depth: number, ctx
     }
   })
 
-  new SelectCell(row, {
+  const show = (id: string) => id === 'title' || ctx.state.columns.includes(id)
+
+  const selectCell = new SelectCell(row, {
     checked: ctx.state.selectedTaskIds.has(task.id),
     onClick: (e) => {
       const cb = e.target as HTMLInputElement
@@ -61,6 +64,7 @@ export function renderTaskRow(tbody: HTMLElement, task: Task, depth: number, ctx
       ctx.onSelectionChange()
     }
   })
+  selectCell.el.querySelector('input')?.setAttribute('aria-label', `${t('Select')}: ${task.title}`)
 
   new ExpandCell(row, {
     hasSubtasks: task.subtasks.length > 0,
@@ -97,47 +101,56 @@ export function renderTaskRow(tbody: HTMLElement, task: Task, depth: number, ctx
     }
   })
 
-  new StatusCell(row, {
-    task,
-    statuses: ctx.statuses,
-    onChange: safeAsync(async (status) => {
-      await ctx.plugin.store.updateTask(ctx.project, task.id, { status })
-      await ctx.onRefresh()
+  if (show('status')) {
+    new StatusCell(row, {
+      task,
+      statuses: ctx.statuses,
+      onChange: safeAsync(async (status) => {
+        await ctx.plugin.store.updateTask(ctx.project, task.id, { status })
+        await ctx.onRefresh()
+      })
     })
-  })
+  }
 
-  new PriorityCell(row, {
-    task,
-    priorities: ctx.priorities,
-    onChange: safeAsync(async (priority) => {
-      await ctx.plugin.store.updateTask(ctx.project, task.id, { priority })
-      await ctx.onRefresh()
+  if (show('priority')) {
+    new PriorityCell(row, {
+      task,
+      priorities: ctx.priorities,
+      onChange: safeAsync(async (priority) => {
+        await ctx.plugin.store.updateTask(ctx.project, task.id, { priority })
+        await ctx.onRefresh()
+      })
     })
-  })
+  }
 
-  new AssigneesCell(row, task.assignees)
+  if (show('assignees')) new AssigneesCell(row, task.assignees)
 
-  new DueDateCell(row, {
-    task,
-    urgency: dueUrgency(task, ctx.statuses),
-    onSave: async (val) => {
-      await ctx.plugin.store.updateTask(ctx.project, task.id, { due: val })
-      await ctx.plugin.store.scheduleAfterChange(ctx.project, task.id)
-      await ctx.onRefresh()
-    }
-  })
+  if (show('due')) {
+    new DueDateCell(row, {
+      task,
+      urgency: dueUrgency(task, ctx.statuses),
+      onSave: async (val) => {
+        await ctx.plugin.store.updateTask(ctx.project, task.id, { due: val })
+        await ctx.plugin.store.scheduleAfterChange(ctx.project, task.id)
+        await ctx.onRefresh()
+      }
+    })
+  }
 
-  new ProgressCell(row, {
-    value: task.progress,
-    color: statusConfig?.color ?? 'var(--interactive-accent)',
-    onSave: async (progress) => {
-      await ctx.plugin.store.updateTask(ctx.project, task.id, { progress })
-      await ctx.onRefresh()
-    }
-  })
-  new TimeCell(row, { logged: totalLoggedHours(task), estimate: task.timeEstimate ?? 0 })
+  if (show('progress')) {
+    new ProgressCell(row, {
+      value: task.progress,
+      color: statusConfig?.color ?? 'var(--interactive-accent)',
+      onSave: async (progress) => {
+        await ctx.plugin.store.updateTask(ctx.project, task.id, { progress })
+        await ctx.onRefresh()
+      }
+    })
+  }
+  if (show('time')) new TimeCell(row, { logged: totalLoggedHours(task), estimate: task.timeEstimate ?? 0 })
 
   for (const cf of ctx.project.customFields) {
+    if (!show(`custom:${cf.id}`)) continue
     const val = task.customFields[cf.id]
     new CustomFieldCell(row, val !== undefined ? stringifyCustomValue(val) : '')
   }

@@ -23,7 +23,16 @@ export class TitleCell {
     this.el.setCssStyles({ paddingLeft: `${props.depth * 20 + 8}px` })
 
     const titleSpan = this.el.createSpan({ text: task.title, cls: 'pm-task-title-text' })
+    titleSpan.tabIndex = 0
+    titleSpan.setAttribute('role', 'button')
+    titleSpan.setAttribute('aria-label', `${t('Open task')}: ${task.title}`)
     titleSpan.addEventListener('click', () => props.onTitleClick())
+    titleSpan.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault()
+        props.onTitleClick()
+      }
+    })
     titleSpan.addEventListener('dblclick', (e) => {
       e.stopPropagation()
       makeInlineEdit({

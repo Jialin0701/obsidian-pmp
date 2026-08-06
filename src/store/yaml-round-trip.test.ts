@@ -150,7 +150,7 @@ describe('project round-trip', () => {
     expect(project.teamMembers).toEqual(['Alice', 'Bob'])
   })
 
-  it('preserves saved views with filter, sortKey, and sortDir', () => {
+  it('preserves saved views with table layout preferences', () => {
     const p = makeProject('P', 'Projects/P.md')
     const view: SavedView = {
       id: 'v1',
@@ -165,7 +165,9 @@ describe('project round-trip', () => {
         showArchived: false
       },
       sortKey: 'due',
-      sortDir: 'desc'
+      sortDir: 'desc',
+      tableColumns: ['title', 'status', 'assignees'],
+      tableColumnWidths: { title: 320, assignees: 180 }
     }
     p.savedViews = [view]
 

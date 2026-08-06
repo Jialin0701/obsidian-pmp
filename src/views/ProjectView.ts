@@ -240,7 +240,12 @@ export class ProjectView extends ItemView {
         this.renderProjectToolbar()
       }
       if (this.subview instanceof TableView) {
-        this.savedTableViewState = { sortKey: sv.sortKey as TableViewState['sortKey'], sortDir: sv.sortDir }
+        this.savedTableViewState = {
+          sortKey: sv.sortKey as TableViewState['sortKey'],
+          sortDir: sv.sortDir,
+          columns: sv.tableColumns,
+          columnWidths: sv.tableColumnWidths
+        }
       }
     }
     void this.persistFilter()
@@ -250,15 +255,19 @@ export class ProjectView extends ItemView {
 
   private async handleSavedViewSave(name: string): Promise<void> {
     if (!this.project) return
-    const sortMeta =
-      this.subview instanceof TableView ? this.subview.getViewState() : { sortKey: 'status', sortDir: 'asc' as const }
+    const sortMeta: TableViewState =
+      this.subview instanceof TableView
+        ? this.subview.getViewState()
+        : { sortKey: 'status', sortDir: 'asc' as const, columns: undefined, columnWidths: undefined }
     const sv: SavedView = {
       id: makeId(),
       name,
       filter: { ...this.filter },
       sortKey: sortMeta.sortKey,
       sortDir: sortMeta.sortDir,
-      viewMode: this.currentView
+      viewMode: this.currentView,
+      ...(sortMeta.columns ? { tableColumns: sortMeta.columns } : {}),
+      ...(sortMeta.columnWidths ? { tableColumnWidths: sortMeta.columnWidths } : {})
     }
     this.project.savedViews.push(sv)
     this.activeSavedViewId = sv.id
@@ -277,6 +286,8 @@ export class ProjectView extends ItemView {
       const ts = this.subview.getViewState()
       sv.sortKey = ts.sortKey
       sv.sortDir = ts.sortDir
+      sv.tableColumns = ts.columns
+      sv.tableColumnWidths = ts.columnWidths
     }
     await this.plugin.store.saveProject(this.project)
     this.header?.refresh()

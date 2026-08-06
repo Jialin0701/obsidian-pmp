@@ -98,6 +98,8 @@ export interface SavedView {
   sortKey: string
   sortDir: 'asc' | 'desc'
   viewMode?: ViewMode
+  tableColumns?: string[]
+  tableColumnWidths?: Record<string, number>
 }
 
 export interface PerProjectFilter {

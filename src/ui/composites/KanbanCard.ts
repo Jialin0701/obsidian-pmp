@@ -29,6 +29,9 @@ export class KanbanCard {
     const { task } = props
     const card = parentEl.createDiv('pm-kanban-card')
     card.draggable = true
+    card.tabIndex = 0
+    card.setAttribute('role', 'button')
+    card.setAttribute('aria-label', task.due ? `${task.title}, ${t('Due')}: ${formatDateShort(task.due)}` : task.title)
     card.dataset.taskId = task.id
     this.el = card
 
@@ -108,6 +111,12 @@ export class KanbanCard {
     })
 
     card.addEventListener('click', () => props.onClick())
+    card.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault()
+        props.onClick()
+      }
+    })
     card.addEventListener('contextmenu', (e) => {
       e.preventDefault()
       props.onContextMenu(e)

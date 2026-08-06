@@ -14,6 +14,45 @@ type SortDir = 'asc' | 'desc'
 
 export type { SortKey, SortDir }
 
+export interface TableColumn {
+  id: string
+  key: SortKey | null
+  label: string
+  defaultWidth: number
+  minWidth: number
+  fixed?: boolean
+}
+
+export function getTableColumns(project: Project): TableColumn[] {
+  return [
+    { id: 'select', key: null, label: '', defaultWidth: 36, minWidth: 32, fixed: true },
+    { id: 'expand', key: null, label: '', defaultWidth: 36, minWidth: 32, fixed: true },
+    { id: 'title', key: 'title', label: 'Task', defaultWidth: 280, minWidth: 180 },
+    { id: 'status', key: 'status', label: 'Status', defaultWidth: 130, minWidth: 100 },
+    { id: 'priority', key: 'priority', label: 'Priority', defaultWidth: 110, minWidth: 90 },
+    { id: 'assignees', key: 'assignees', label: 'Assignees', defaultWidth: 150, minWidth: 110 },
+    { id: 'due', key: 'due', label: 'Due', defaultWidth: 120, minWidth: 100 },
+    { id: 'progress', key: 'progress', label: 'Progress', defaultWidth: 130, minWidth: 110 },
+    { id: 'time', key: null, label: 'Time', defaultWidth: 100, minWidth: 80 },
+    ...project.customFields.map(
+      (cf): TableColumn => ({
+        id: `custom:${cf.id}`,
+        key: null,
+        label: cf.name,
+        defaultWidth: 140,
+        minWidth: 100
+      })
+    ),
+    { id: 'actions', key: null, label: '', defaultWidth: 44, minWidth: 40, fixed: true }
+  ]
+}
+
+export function defaultTableColumnIds(project: Project): string[] {
+  return getTableColumns(project)
+    .filter((column) => !column.fixed)
+    .map((column) => column.id)
+}
+
 export interface TableState {
   sortKey: SortKey
   sortDir: SortDir
@@ -32,6 +71,8 @@ export interface TableState {
   windowStart: number
   windowEnd: number
   renderWindow: (() => void) | null
+  columns: string[]
+  columnWidths: Record<string, number>
 }
 
 export interface TableContext {
@@ -45,9 +86,51 @@ export interface TableContext {
   onRefresh: () => Promise<void>
   onSelectionChange: () => void
   onBulkDelete: () => void
+  onLayoutChange: () => void
 }
 
 export function renderTable(ctx: TableContext): void {
+  const allColumns = getTableColumns(ctx.project)
+  const configurableIds = new Set(defaultTableColumnIds(ctx.project))
+  ctx.state.columns = ctx.state.columns.filter((id) => configurableIds.has(id))
+  if (!ctx.state.columns.length) ctx.state.columns = defaultTableColumnIds(ctx.project)
+  const visibleIds = new Set(ctx.state.columns)
+  const columns = allColumns.filter((column) => column.fixed || visibleIds.has(column.id))
+
+  const toolbar = ctx.container.createDiv('pm-table-toolbar')
+  const columnsButton = toolbar.createEl('button', { text: t('Columns'), cls: 'pm-table-columns-button' })
+  columnsButton.setAttribute('aria-expanded', 'false')
+  columnsButton.setAttribute('aria-haspopup', 'true')
+  const columnsMenu = toolbar.createDiv('pm-table-columns-menu')
+  columnsMenu.addClass('pm-hidden')
+  columnsMenu.setAttribute('role', 'menu')
+  columnsMenu.createDiv({ text: t('Show column'), cls: 'pm-table-columns-menu-heading' })
+  for (const column of allColumns.filter((item) => !item.fixed)) {
+    const option = columnsMenu.createEl('label', { cls: 'pm-table-column-option' })
+    const checkbox = option.createEl('input', { type: 'checkbox' })
+    checkbox.checked = visibleIds.has(column.id)
+    checkbox.disabled = column.id === 'title'
+    checkbox.setAttribute('aria-label', `${t('Show column')}: ${t(column.label)}`)
+    option.createSpan({ text: t(column.label) })
+    checkbox.addEventListener('change', () => {
+      const next = new Set(ctx.state.columns)
+      if (checkbox.checked) next.add(column.id)
+      else next.delete(column.id)
+      ctx.state.columns = [...next]
+      ctx.onLayoutChange()
+    })
+  }
+  const resetButton = columnsMenu.createEl('button', { text: t('Reset columns'), cls: 'pm-table-columns-reset' })
+  resetButton.addEventListener('click', () => {
+    ctx.state.columns = defaultTableColumnIds(ctx.project)
+    ctx.state.columnWidths = {}
+    ctx.onLayoutChange()
+  })
+  columnsButton.addEventListener('click', () => {
+    const isHidden = columnsMenu.hasClass('pm-hidden')
+    columnsMenu.toggleClass('pm-hidden', !isHidden)
+    columnsButton.setAttribute('aria-expanded', String(isHidden))
+  })
   const wrapper = ctx.container.createDiv('pm-table-wrapper')
   ctx.state.wrapper = wrapper
   let scrollScheduled = false
@@ -64,12 +147,22 @@ export function renderTable(ctx: TableContext): void {
     })
   })
   const table = wrapper.createEl('table', { cls: 'pm-table' })
+  table.style.setProperty('--pm-table-column-count', String(columns.length))
+  const colgroup = table.createEl('colgroup')
+  const columnEls = new Map<string, HTMLTableColElement>()
+  for (const column of columns) {
+    const col = colgroup.createEl('col')
+    col.dataset.columnId = column.id
+    col.style.width = `${ctx.state.columnWidths[column.id] ?? column.defaultWidth}px`
+    columnEls.set(column.id, col)
+  }
 
   const thead = table.createEl('thead')
   const hrow = thead.createEl('tr')
 
-  const selectAllTh = hrow.createEl('th', { cls: 'pm-table-cell-select' })
+  const selectAllTh = hrow.createEl('th', { cls: 'pm-table-cell-select', attr: { 'data-column-id': 'select' } })
   const selectAllCb = selectAllTh.createEl('input', { type: 'checkbox', cls: 'pm-select-all-checkbox' })
+  selectAllCb.setAttribute('aria-label', t('Select all'))
   selectAllCb.addEventListener('change', () => {
     const ids = getVisibleTaskIds(ctx.state)
     if (selectAllCb.checked) {
@@ -81,66 +174,109 @@ export function renderTable(ctx: TableContext): void {
     ctx.onSelectionChange()
   })
 
-  const cols: { key: SortKey | null; label: string; width?: string }[] = [
-    { key: null, label: '', width: '32px' },
-    { key: 'title', label: 'Task', width: 'auto' },
-    { key: 'status', label: 'Status', width: '130px' },
-    { key: 'priority', label: 'Priority', width: '110px' },
-    { key: 'assignees', label: 'Assignees', width: '140px' },
-    { key: 'due', label: 'Due', width: '110px' },
-    { key: 'progress', label: 'Progress', width: '120px' },
-    { key: null, label: 'Time', width: '90px' }
-  ]
   const sortableHeaders: { key: SortKey; th: HTMLElement }[] = []
   const paintSortIndicators = () => {
     for (const { key, th } of sortableHeaders) {
       th.querySelector('.pm-sort-indicator')?.remove()
       if (ctx.state.sortKey === key) {
+        th.setAttribute('aria-sort', ctx.state.sortDir === 'asc' ? 'ascending' : 'descending')
         th.createSpan({
           text: ctx.state.sortDir === 'asc' ? ' \u2191' : ' \u2193',
           cls: 'pm-sort-indicator'
         })
+      } else {
+        th.setAttribute('aria-sort', 'none')
       }
     }
   }
 
-  for (const col of cols) {
-    const label = t(col.label)
-    const th = hrow.createEl('th')
-    if (col.width) th.setCssStyles({ width: col.width })
-    if (col.key) {
+  for (const column of columns.filter((item) => item.id !== 'select')) {
+    const label = t(column.label)
+    const th = hrow.createEl('th', { attr: { 'data-column-id': column.id } })
+    if (column.id === 'expand') th.addClass('pm-table-cell-expand')
+    if (column.id === 'actions') th.addClass('pm-table-cell-actions')
+    if (column.key) {
       th.addClass('pm-table-th-sortable')
       th.setAttribute('role', 'button')
+      th.setAttribute('tabindex', '0')
       th.setAttribute('aria-label', `${t('Sort by')} ${label}`)
       th.createSpan({ text: label })
-      sortableHeaders.push({ key: col.key, th })
-      th.addEventListener('click', () => {
-        if (ctx.state.sortKey === col.key) {
+      sortableHeaders.push({ key: column.key, th })
+      const applySort = () => {
+        if (ctx.state.sortKey === column.key) {
           ctx.state.sortDir = ctx.state.sortDir === 'asc' ? 'desc' : 'asc'
         } else {
-          ctx.state.sortKey = col.key as SortKey
+          ctx.state.sortKey = column.key as SortKey
           ctx.state.sortDir = 'asc'
         }
         paintSortIndicators()
         refreshTableBody(ctx)
+      }
+      th.addEventListener('click', applySort)
+      th.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault()
+          applySort()
+        }
       })
-    } else {
+    } else if (column.id !== 'expand' && column.id !== 'actions') {
       th.setText(label)
+    }
+    if (column.id !== 'select' && column.id !== 'expand' && column.id !== 'actions') {
+      addColumnResizer(th, column, columnEls.get(column.id), ctx)
     }
   }
   paintSortIndicators()
 
-  for (const cf of ctx.project.customFields) {
-    const th = hrow.createEl('th', { text: cf.name })
-    th.setCssStyles({ width: '120px' })
-  }
-
-  // Actions column, which must stay last.
-  const actionsTh = hrow.createEl('th')
-  actionsTh.setCssStyles({ width: '40px' })
-
   ctx.state.tableBody = table.createEl('tbody')
   fillTableBody(ctx)
+}
+
+function addColumnResizer(
+  th: HTMLElement,
+  column: TableColumn,
+  colEl: HTMLTableColElement | undefined,
+  ctx: TableContext
+): void {
+  const handle = th.createSpan({ cls: 'pm-table-col-resizer' })
+  handle.tabIndex = 0
+  handle.setAttribute('role', 'separator')
+  handle.setAttribute('aria-label', `${t('Adjust column width')}: ${t(column.label)}`)
+  handle.setAttribute('aria-orientation', 'vertical')
+  handle.setAttribute('aria-valuemin', String(column.minWidth))
+  handle.setAttribute('aria-valuenow', String(ctx.state.columnWidths[column.id] ?? column.defaultWidth))
+  handle.addEventListener('keydown', (event) => {
+    if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return
+    event.preventDefault()
+    const currentWidth = ctx.state.columnWidths[column.id] ?? column.defaultWidth
+    const delta = event.key === 'ArrowRight' ? 10 : -10
+    const nextWidth = Math.max(column.minWidth, currentWidth + delta)
+    ctx.state.columnWidths[column.id] = nextWidth
+    if (colEl) colEl.style.width = `${nextWidth}px`
+    th.style.width = `${nextWidth}px`
+    handle.setAttribute('aria-valuenow', String(nextWidth))
+  })
+  handle.addEventListener('pointerdown', (event) => {
+    event.preventDefault()
+    event.stopPropagation()
+    const startX = event.clientX
+    const startWidth = th.getBoundingClientRect().width
+    activeDocument.body.addClass('pm-table-resizing')
+    const onMove = (moveEvent: PointerEvent) => {
+      const nextWidth = Math.max(column.minWidth, Math.round(startWidth + moveEvent.clientX - startX))
+      if (colEl) colEl.style.width = `${nextWidth}px`
+      th.style.width = `${nextWidth}px`
+      ctx.state.columnWidths[column.id] = nextWidth
+      handle.setAttribute('aria-valuenow', String(nextWidth))
+    }
+    const onUp = () => {
+      activeDocument.body.removeClass('pm-table-resizing')
+      window.removeEventListener('pointermove', onMove)
+      window.removeEventListener('pointerup', onUp)
+    }
+    window.addEventListener('pointermove', onMove)
+    window.addEventListener('pointerup', onUp, { once: true })
+  })
 }
 
 export function refreshTableBody(ctx: TableContext): void {

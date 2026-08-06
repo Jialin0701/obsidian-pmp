@@ -44,10 +44,8 @@
   box-sizing: border-box;
 }
 .pm-gantt-left-header-label {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
   color: var(--text-muted);
 }
 
@@ -152,11 +150,9 @@
 }
 
 .pm-gantt-header-month-top {
-  font-size: 10px;
+  font-size: 11px;
   fill: var(--text-muted);
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
 }
 .pm-gantt-header-year {
   font-size: 11px;
@@ -164,13 +160,13 @@
   font-weight: 600;
 }
 .pm-gantt-header-day {
-  font-size: 10px;
+  font-size: 11px;
   fill: var(--text-muted);
   text-anchor: middle;
   dominant-baseline: central;
 }
 .pm-gantt-header-week {
-  font-size: 10px;
+  font-size: 11px;
   fill: var(--text-muted);
   text-anchor: middle;
   dominant-baseline: central;
@@ -236,20 +232,26 @@
 
 .pm-gantt-bar {
   cursor: pointer;
+  opacity: 0.5;
   transition: filter 0.15s;
 }
 .pm-gantt-bar:hover {
   filter: brightness(1.15);
 }
+.pm-gantt-bar:focus-visible {
+  outline: none;
+  stroke: var(--interactive-accent);
+  stroke-width: 2;
+  filter: brightness(1.1);
+}
 .pm-gantt-bar-progress {
   pointer-events: none;
 }
 .pm-gantt-bar-label {
-  font-size: 10px;
+  font-size: 11px;
   fill: rgba(255, 255, 255, 0.85);
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
+  letter-spacing: normal;
   pointer-events: none;
   dominant-baseline: central;
   text-shadow: 0 0 3px rgba(0, 0, 0, 0.55);

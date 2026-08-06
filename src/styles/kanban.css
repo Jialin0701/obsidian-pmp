@@ -24,8 +24,8 @@
 .pm-kanban-col {
   display: flex;
   flex-direction: column;
-  width: 280px;
-  min-width: 280px;
+  width: clamp(260px, 28vw, 320px);
+  min-width: 260px;
   height: 100%;
   background: var(--background-secondary);
   border-radius: var(--radius-m);
@@ -68,6 +68,7 @@
   font-size: 12px;
   font-weight: 700;
   color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
 }
 
 .pm-kanban-cards {
@@ -110,7 +111,7 @@
 .pm-kanban-card-priority-bar {
   height: 3px;
   flex-shrink: 0;
-  opacity: 0.5;
+  opacity: 0.8;
 }
 .pm-kanban-card-body {
   flex: 1;
@@ -136,8 +137,27 @@
   overflow: hidden;
   display: -webkit-box;
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: 3;
-  line-clamp: 3;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
+
+.pm-kanban-card:focus-visible {
+  border-color: var(--interactive-accent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--interactive-accent) 25%, transparent);
+}
+
+.pm-kanban-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 72px;
+  margin: 4px 0;
+  padding: 12px;
+  border: 1px dashed var(--background-modifier-border);
+  border-radius: var(--radius-s);
+  color: var(--text-muted);
+  font-size: 12px;
+  text-align: center;
 }
 .pm-kanban-card-tags {
   display: flex;

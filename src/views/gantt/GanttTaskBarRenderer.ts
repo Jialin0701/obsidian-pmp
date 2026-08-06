@@ -27,6 +27,7 @@ export function renderTaskBar(g: SVGGElement, task: Task, row: number, _depth: n
   }
 
   const statusConfig = getStatusConfig(ctx.statuses, task.status)
+  const priorityConfig = getPriorityConfig(ctx.priorities, task.priority)
   const color = statusConfig?.color ?? getComputedStyle(ctx.svgEl).getPropertyValue('--interactive-accent').trim()
   const rowY = HEADER_HEIGHT + row * ROW_HEIGHT
   const y = rowY + BAR_PADDING
@@ -68,7 +69,10 @@ export function renderTaskBar(g: SVGGElement, task: Task, row: number, _depth: n
     ry: BAR_BORDER_RADIUS,
     fill: color,
     opacity: 0.4,
-    class: 'pm-gantt-bar'
+    class: 'pm-gantt-bar',
+    tabindex: 0,
+    role: 'button',
+    'aria-label': `${task.title}, ${t(statusConfig?.label ?? task.status)}, ${t(priorityConfig?.label ?? task.priority)}, ${t('Progress')}: ${task.progress}%`
   })
   barGroup.appendChild(rect)
 
@@ -111,7 +115,6 @@ export function renderTaskBar(g: SVGGElement, task: Task, row: number, _depth: n
   }
 
   const ttEl = svgEl('title', {})
-  const priorityConfig = getPriorityConfig(ctx.priorities, task.priority)
   const assigneesStr = task.assignees.length ? `\n${t('Assignees')}: ${task.assignees.join(', ')}` : ''
   ttEl.textContent = `${task.title}\n${t(statusConfig?.label ?? task.status)} \u00b7 ${t(priorityConfig?.label ?? task.priority)}\n${t('Start')}: ${task.start || '\u2014'}  ${t('Due')}: ${task.due || '\u2014'}\n${t('Progress')}: ${task.progress}%${assigneesStr}`
   rect.appendChild(ttEl)
@@ -188,12 +191,19 @@ export function renderTaskBar(g: SVGGElement, task: Task, row: number, _depth: n
     rect.setAttribute('cursor', 'pointer')
   }
 
-  rect.addEventListener('click', () => {
+  const openTask = () => {
     if (ctx.drag.dragMoved) {
       ctx.drag.dragMoved = false
       return
     }
     openTaskModal(ctx.plugin, ctx.project, { task, onSave: () => ctx.onRefresh() })
+  }
+  rect.addEventListener('click', openTask)
+  rect.addEventListener('keydown', (event: KeyboardEvent) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault()
+      openTask()
+    }
   })
 }
 
@@ -282,7 +292,10 @@ function renderMilestoneDiamond(g: SVGGElement, task: Task, row: number, color: 
     fill: color,
     opacity: 0.8,
     class: 'pm-gantt-milestone',
-    cursor: 'pointer'
+    cursor: 'pointer',
+    tabindex: 0,
+    role: 'button',
+    'aria-label': `${task.title}, ${t('Milestone')}, ${t('Date')}: ${task.due || task.start || '—'}`
   })
   g.appendChild(diamond)
 
@@ -292,6 +305,12 @@ function renderMilestoneDiamond(g: SVGGElement, task: Task, row: number, color: 
 
   diamond.addEventListener('click', () => {
     openTaskModal(ctx.plugin, ctx.project, { task, onSave: () => ctx.onRefresh() })
+  })
+  diamond.addEventListener('keydown', (event: KeyboardEvent) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault()
+      openTaskModal(ctx.plugin, ctx.project, { task, onSave: () => ctx.onRefresh() })
+    }
   })
 }
 

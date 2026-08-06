@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.10.0] - 2026-08-07
+
+### Added
+
+- New projects show a live preview of the icon, name, description, and color.
+- Advanced project settings can be collapsed while creating a project and expanded when editing one.
+- Table views include a column manager with reset-to-default support.
+- Table columns can be resized with the mouse or keyboard, and preferences are saved with saved views.
+
+### Changed
+
+- Assignees in the table use readable name pills instead of circular avatars.
+- Table headers, spacing, progress bars, and horizontal scrolling have been refined for dense Chinese and English data.
+- Keyboard focus, labels, and interaction states have been expanded across project, table, board, and Gantt views.
+
 ## [1.9.1] - 2026-08-07
 
 ### Fixed

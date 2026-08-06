@@ -3,6 +3,15 @@
 .pm-root {
   --pm-ghost-border: rgba(0, 0, 0, 0.06);
   --pm-shadow-ambient: rgba(0, 0, 0, 0.06);
+  --pm-space-1: 4px;
+  --pm-space-2: 8px;
+  --pm-space-3: 12px;
+  --pm-space-4: 16px;
+  --pm-space-5: 24px;
+  --pm-radius-control: var(--radius-s);
+  --pm-radius-card: var(--radius-m);
+  --pm-motion-fast: 150ms;
+  --pm-motion-normal: 220ms;
 
   font-family: var(--font-interface);
   color: var(--text-normal);
