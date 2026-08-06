@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.11.0] - 2026-08-07
+
+### Added
+
+- The project management dashboard now supports a compact list view alongside the card grid.
+- Dashboard view choice is preserved when the workspace restores the project overview.
+
+### Changed
+
+- Project cards use a quieter flat visual treatment with clearer focus and hover states.
+- List rows show the project icon, color, description, task progress, and completion percentage at a glance.
+- Dashboard view controls now expose accessible labels and selected states for keyboard and assistive technology users.
+
 ## [1.10.0] - 2026-08-07
 
 ### Added

@@ -17,6 +17,9 @@ export class ProjectCard {
   constructor(parentEl: HTMLElement, props: ProjectCardProps) {
     const card = parentEl.createDiv('pm-project-card')
     this.el = card
+    card.setAttr('role', 'button')
+    card.setAttr('tabindex', '0')
+    card.setAttr('aria-label', props.title)
 
     const colorBar = card.createDiv('pm-project-card-bar')
     colorBar.setCssStyles({ background: props.color })
@@ -36,5 +39,10 @@ export class ProjectCard {
 
     card.addEventListener('click', () => props.onClick())
     card.addEventListener('contextmenu', (e) => props.onContextMenu(e))
+    card.addEventListener('keydown', (e) => {
+      if (e.key !== 'Enter' && e.key !== ' ') return
+      e.preventDefault()
+      props.onClick()
+    })
   }
 }

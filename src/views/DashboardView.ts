@@ -1,10 +1,15 @@
 import { ItemView, WorkspaceLeaf, TFile } from 'obsidian'
 import type PMPlugin from '../main'
 import { renderProjectListToolbar, renderProjectListContent } from './ProjectListRenderer'
-import type { ProjectListContext } from './ProjectListRenderer'
+import type { ProjectListContext, ProjectListViewMode } from './ProjectListRenderer'
 import { t } from '../i18n'
 
 export const PM_DASHBOARD_VIEW_TYPE = 'pm-dashboard'
+
+interface DashboardViewState {
+  viewMode?: ProjectListViewMode
+  [key: string]: unknown
+}
 
 export class DashboardView extends ItemView {
   private plugin: PMPlugin
@@ -12,6 +17,7 @@ export class DashboardView extends ItemView {
   private bodyEl!: HTMLElement
   private renderToken = 0
   private reloadDebounceTimer: number | null = null
+  private viewMode: ProjectListViewMode = 'board'
 
   constructor(leaf: WorkspaceLeaf, plugin: PMPlugin) {
     super(leaf)
@@ -27,6 +33,16 @@ export class DashboardView extends ItemView {
   }
   getIcon(): string {
     return 'chart-gantt'
+  }
+
+  async setState(state: DashboardViewState, result: unknown): Promise<void> {
+    this.viewMode = state.viewMode === 'list' ? 'list' : 'board'
+    await super.setState(state, result as import('obsidian').ViewStateResult)
+    if (this.bodyEl) this.render()
+  }
+
+  getState(): DashboardViewState {
+    return { viewMode: this.viewMode }
   }
 
   onOpen(): Promise<void> {
@@ -89,6 +105,11 @@ export class DashboardView extends ItemView {
       plugin: this.plugin,
       toolbarEl: this.toolbarEl,
       contentEl: this.bodyEl,
+      viewMode: this.viewMode,
+      onViewModeChange: (mode) => {
+        this.viewMode = mode
+        this.render()
+      },
       isStale: () => token !== this.renderToken,
       openProjectFile: (file: TFile) => this.plugin.router.openProject(file)
     }

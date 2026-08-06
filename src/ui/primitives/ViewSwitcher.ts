@@ -20,10 +20,16 @@ export class ViewSwitcher<T extends string> {
     for (const opt of props.options) {
       const btn = new ExtraButtonComponent(this.el).setIcon(opt.icon).setTooltip(opt.label)
       btn.extraSettingsEl.addClass('pm-view-btn')
+      btn.extraSettingsEl.setAttr('aria-label', opt.label)
+      btn.extraSettingsEl.setAttr('aria-pressed', opt.id === props.active ? 'true' : 'false')
       if (opt.id === props.active) btn.extraSettingsEl.addClass('pm-view-btn--active')
       btn.onClick(() => {
-        this.el.querySelectorAll('.pm-view-btn').forEach((b) => b.removeClass('pm-view-btn--active'))
+        this.el.querySelectorAll<HTMLElement>('.pm-view-btn').forEach((b) => {
+          b.removeClass('pm-view-btn--active')
+          b.setAttr('aria-pressed', 'false')
+        })
         btn.extraSettingsEl.addClass('pm-view-btn--active')
+        btn.extraSettingsEl.setAttr('aria-pressed', 'true')
         props.onChange(opt.id)
       })
     }
