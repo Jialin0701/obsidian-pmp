@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.13.0] - 2026-08-07
+
+### Added
+
+- Project cards now show descriptions, task status summaries, participant pills, and the last update date.
+- Project list view now presents project, description, participants, last update, and progress as aligned fields.
+- Project dashboard summaries include nested task counts and status-aware completion statistics.
+
+### Changed
+
+- Project dashboard layouts adapt to narrow panes without introducing horizontal scrolling.
+- Empty project states now use a native Lucide icon instead of an emoji.
+
 ## [1.12.0] - 2026-08-07
 
 ### Added
