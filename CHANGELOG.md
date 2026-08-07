@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.13.1] - 2026-08-07
+
+### Changed
+
+- Project cards use a wider responsive layout and wrap participant pills cleanly when a project has many members.
+- Project dashboard lists and task tables use full-width, aligned headers and quieter Bases-inspired row separators.
+
+### Fixed
+
+- Opening a project that is already displayed now focuses its existing tab instead of creating a duplicate.
+
 ## [1.13.0] - 2026-08-07
 
 ### Added
