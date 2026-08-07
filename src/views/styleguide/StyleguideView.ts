@@ -178,7 +178,7 @@ export class StyleguideView extends ItemView {
     const sec = this.section('EmptyState', 'empty-state')
     const row = this.row(sec, 'icon, title, body, action')
     new EmptyState(row)
-      .setIcon('📋')
+      .setIcon('folder-kanban')
       .setTitle('No projects yet')
       .setBody('Create your first project to get started.')
       .setAction('+ new project', noop)
@@ -297,10 +297,18 @@ export class StyleguideView extends ItemView {
     const sec = this.section('Cards', 'cards')
     const projectRow = this.row(sec, 'ProjectCard')
     new ProjectCard(projectRow, {
-      title: 'Website relaunch',
-      icon: 'lucide:rocket',
-      tasksDone: 4,
-      tasksTotal: 10,
+      summary: {
+        title: 'Website relaunch',
+        description: 'Refresh the public site and launch the new content system.',
+        icon: 'lucide:rocket',
+        members: ['Alice', 'Bob', 'Carol', 'David'],
+        totalTasks: 10,
+        completedTasks: 4,
+        activeTasks: 6,
+        progress: 40,
+        updatedAt: new Date().toISOString(),
+        statusCounts: []
+      },
       onClick: noop,
       onContextMenu: noop
     })

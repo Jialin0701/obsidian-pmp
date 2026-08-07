@@ -76,6 +76,27 @@ export interface Project {
   taskIndex: TaskIndex
 }
 
+/** Derived dashboard data. This is not persisted with the project. */
+export interface ProjectStatusSummary {
+  id: string
+  label: string
+  count: number
+  complete: boolean
+}
+
+export interface ProjectSummary {
+  title: string
+  description: string
+  icon: string
+  members: string[]
+  totalTasks: number
+  completedTasks: number
+  activeTasks: number
+  progress: number
+  updatedAt: string
+  statusCounts: ProjectStatusSummary[]
+}
+
 /** Tasks are excluded: they change through the task mutators, never a whole-project write. */
 export type ProjectPatch = Partial<
   Pick<Project, 'title' | 'description' | 'color' | 'icon' | 'customFields' | 'teamMembers' | 'savedViews' | 'config'>

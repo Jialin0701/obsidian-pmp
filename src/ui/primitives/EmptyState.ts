@@ -1,4 +1,5 @@
-import { ButtonComponent } from 'obsidian'
+import { ButtonComponent, setIcon as setObsidianIcon } from 'obsidian'
+import { isIconName } from '../../utils'
 
 export class EmptyState {
   el: HTMLElement
@@ -13,7 +14,9 @@ export class EmptyState {
 
   setIcon(text: string): this {
     this.iconEl ??= this.el.createDiv('pm-empty-icon')
-    this.iconEl.setText(text)
+    this.iconEl.empty()
+    if (isIconName(text)) setObsidianIcon(this.iconEl, text)
+    else this.iconEl.setText(text)
     return this
   }
 

@@ -1,13 +1,14 @@
 import { TFile, Menu, ButtonComponent } from 'obsidian'
 import type PMPlugin from '../main'
-import type { Project, Task, StatusConfig } from '../types'
-import { safeAsync, isTerminalStatus } from '../utils'
+import type { Project } from '../types'
+import { safeAsync } from '../utils'
 import { openProjectModal } from '../ui/ModalFactory'
 import { EmptyState } from '../ui/primitives/EmptyState'
 import { ProjectCard } from '../ui/composites/ProjectCard'
 import { ProjectListRow } from '../ui/composites/ProjectListRow'
 import { ViewSwitcher } from '../ui/primitives/ViewSwitcher'
 import { t } from '../i18n'
+import { summarizeProject } from './ProjectSummary'
 
 export type ProjectListViewMode = 'board' | 'list'
 
@@ -49,7 +50,7 @@ export async function renderProjectListContent(ctx: ProjectListContext): Promise
 
   if (projects.length === 0) {
     new EmptyState(ctx.contentEl)
-      .setIcon('📋')
+      .setIcon('folder-kanban')
       .setTitle(t('No projects yet'))
       .setBody(t('Create your first project to get started.'))
       .setAction(t('+ new project'), () => openCreateProjectModal(ctx))
@@ -58,16 +59,19 @@ export async function renderProjectListContent(ctx: ProjectListContext): Promise
 
   const collection = ctx.contentEl.createDiv(ctx.viewMode === 'list' ? 'pm-project-list' : 'pm-project-grid')
   collection.setAttr('role', 'list')
+  if (ctx.viewMode === 'list') {
+    const header = collection.createDiv('pm-project-list-header')
+    header.createSpan({ text: t('Project') })
+    header.createSpan({ text: t('Description') })
+    header.createSpan({ text: t('Participants') })
+    header.createSpan({ text: t('Last updated') })
+    header.createSpan({ text: t('Progress') })
+  }
   for (const project of projects) {
     const statuses = ctx.plugin.store.configFor(project).statuses
-    const total = countTasks(project.tasks, false, statuses)
-    const done = countTasks(project.tasks, true, statuses)
+    const summary = summarizeProject(project, statuses)
     const props = {
-      title: project.title,
-      description: project.description,
-      icon: project.icon,
-      tasksDone: done,
-      tasksTotal: total,
+      summary,
       onClick: safeAsync(async () => {
         const file = ctx.plugin.app.vault.getAbstractFileByPath(project.filePath)
         if (file instanceof TFile) await ctx.openProjectFile(file)
@@ -115,13 +119,4 @@ function openProjectContextMenu(ctx: ProjectListContext, project: Project, e: Mo
       )
   )
   menu.showAtMouseEvent(e)
-}
-
-function countTasks(tasks: Task[], doneOnly: boolean, statuses: StatusConfig[]): number {
-  let n = 0
-  for (const t of tasks) {
-    if (!doneOnly || isTerminalStatus(t.status, statuses)) n++
-    n += countTasks(t.subtasks, doneOnly, statuses)
-  }
-  return n
 }
