@@ -1,11 +1,11 @@
 import { ProgressBar } from '../primitives/ProgressBar'
 import { t } from '../../i18n'
+import { renderProjectIcon } from '../../utils'
 
 export interface ProjectListRowProps {
   title: string
   description: string
   icon: string
-  color: string
   tasksDone: number
   tasksTotal: number
   onClick: () => void
@@ -23,11 +23,8 @@ export class ProjectListRow {
     row.setAttr('tabindex', '0')
     row.setAttr('aria-label', props.title)
 
-    const swatch = row.createDiv('pm-project-list-row-swatch')
-    swatch.setCssStyles({ background: props.color })
-
     const identity = row.createDiv('pm-project-list-row-identity')
-    identity.createDiv({ text: props.icon, cls: 'pm-project-list-row-icon' })
+    renderProjectIcon(identity, props.icon, 'pm-project-list-row-icon')
 
     const copy = identity.createDiv('pm-project-list-row-copy')
     copy.createEl('h3', { text: props.title, cls: 'pm-project-list-row-title' })
@@ -42,7 +39,7 @@ export class ProjectListRow {
     taskCount.createSpan({ text: `${props.tasksDone}/${props.tasksTotal}`, cls: 'pm-project-list-row-task-value' })
     taskCount.createSpan({ text: t('tasks'), cls: 'pm-project-list-row-task-label' })
     metrics.createDiv({ text: `${Math.round(progress)}%`, cls: 'pm-project-list-row-percent' })
-    new ProgressBar(metrics).setSize('sm').setValue(progress).setColor(props.color)
+    new ProgressBar(metrics).setSize('sm').setValue(progress).setColor('var(--interactive-accent)')
 
     row.addEventListener('click', () => props.onClick())
     row.addEventListener('contextmenu', (e) => props.onContextMenu(e))

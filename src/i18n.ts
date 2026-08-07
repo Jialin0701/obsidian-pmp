@@ -148,6 +148,8 @@ const ZH: Record<string, string> = {
   Description: '描述',
   'Project name': '项目名称',
   'Select icon': '选择图标',
+  'Search icons': '搜索图标',
+  'No icons found': '未找到图标',
   'Open task': '打开任务',
   'Project preview': '项目预览',
   'No description': '暂无描述',

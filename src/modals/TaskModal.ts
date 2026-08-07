@@ -14,7 +14,7 @@ import type PMPlugin from '../main'
 import { type Project, type Task, makeTask } from '../types'
 import { flattenTasks } from '../store/TaskTreeOps'
 import { TaskFileNameConflictError } from '../store'
-import { safeAsync, getDefaultStatusId, getDefaultPriorityId, getPriorityConfig } from '../utils'
+import { safeAsync, getDefaultStatusId, getDefaultPriorityId, getPriorityConfig, setProjectIcon } from '../utils'
 import { confirmDialog } from '../ui/ModalFactory'
 import { renderTaskFormFields } from './TaskFormFields'
 import { renderTimeTrackingPanel } from './TimeTrackingPanel'
@@ -240,9 +240,7 @@ export class TaskModal extends Modal {
     const crumb = header.createDiv('pm-te-crumb')
     if (this.project.icon) {
       const iconEl = crumb.createSpan({ cls: 'pm-te-crumb-icon' })
-      // project.icon is either an emoji or a Lucide icon name.
-      if (/^[a-z0-9-]+$/.test(this.project.icon)) setIcon(iconEl, this.project.icon)
-      else iconEl.setText(this.project.icon)
+      setProjectIcon(iconEl, this.project.icon)
     }
     crumb.createSpan({ cls: 'pm-te-crumb-name', text: this.project.title })
     const crumbSep = crumb.createSpan({ cls: 'pm-te-crumb-sep' })

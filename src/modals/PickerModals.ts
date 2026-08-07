@@ -1,6 +1,7 @@
 import { SuggestModal, App } from 'obsidian'
 import type { Project, Task } from '../types'
 import { t } from '../i18n'
+import { renderProjectIcon } from '../utils'
 
 const NEW_TAG_PREFIX = '__new__:'
 
@@ -20,7 +21,8 @@ export class ProjectPickerModal extends SuggestModal<Project> {
   }
 
   renderSuggestion(project: Project, el: HTMLElement): void {
-    el.createSpan({ text: `${project.icon} ${project.title}` })
+    renderProjectIcon(el, project.icon, 'pm-project-picker-icon')
+    el.createSpan({ text: project.title })
   }
 
   onChooseSuggestion(project: Project): void {

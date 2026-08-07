@@ -66,7 +66,6 @@ export async function renderProjectListContent(ctx: ProjectListContext): Promise
       title: project.title,
       description: project.description,
       icon: project.icon,
-      color: project.color,
       tasksDone: done,
       tasksTotal: total,
       onClick: safeAsync(async () => {

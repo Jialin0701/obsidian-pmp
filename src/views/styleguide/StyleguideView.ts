@@ -298,8 +298,7 @@ export class StyleguideView extends ItemView {
     const projectRow = this.row(sec, 'ProjectCard')
     new ProjectCard(projectRow, {
       title: 'Website relaunch',
-      icon: '📋',
-      color: '#8b72be',
+      icon: 'lucide:rocket',
       tasksDone: 4,
       tasksTotal: 10,
       onClick: noop,

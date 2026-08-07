@@ -49,7 +49,8 @@ export function serializeProject(project: Project, statuses: StatusConfig[] = []
   appendYaml(yamlLines, fm, 0)
   yamlLines.push('---')
   yamlLines.push('')
-  yamlLines.push(`# ${project.icon} ${project.title}`)
+  const headingIcon = project.icon.startsWith('lucide:') || /^[a-z0-9-]+$/.test(project.icon) ? '' : `${project.icon} `
+  yamlLines.push(`# ${headingIcon}${project.title}`)
   yamlLines.push('')
   if (project.description) {
     yamlLines.push(project.description)

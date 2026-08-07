@@ -1,7 +1,7 @@
 import { ButtonComponent, ExtraButtonComponent, ItemView, WorkspaceLeaf, TFile } from 'obsidian'
 import type PMPlugin from '../main'
 import { type Project, type ViewMode, type FilterState, type SavedView, makeDefaultFilter, makeId } from '../types'
-import { truncateTitle, safeAsync } from '../utils'
+import { truncateTitle, safeAsync, setProjectIcon } from '../utils'
 import type { SubView } from './SubView'
 import { TableView } from './table/TableView'
 import type { TableViewState } from './table/TableView'
@@ -312,10 +312,10 @@ export class ProjectView extends ItemView {
 
     const left = this.toolbarEl.createDiv('pm-toolbar-left')
     const iconEl = left.createSpan({
-      text: this.project.icon,
       cls: 'pm-toolbar-icon',
       attr: { 'aria-label': t('Edit project'), role: 'button', tabindex: '0' }
     })
+    setProjectIcon(iconEl, this.project.icon)
     iconEl.addEventListener('click', () => {
       openProjectModal(this.plugin, { project: this.project })
     })

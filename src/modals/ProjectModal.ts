@@ -1,7 +1,7 @@
-import { App, ButtonComponent, Modal } from 'obsidian'
+import { App, ButtonComponent, getIconIds, Modal } from 'obsidian'
 import type PMPlugin from '../main'
 import { type Project, type ProjectConfig, type ProjectPatch, type CustomFieldDef, makeId, makeProject } from '../types'
-import { safeAsync } from '../utils'
+import { DEFAULT_PROJECT_ICON, PROJECT_ICON_IDS, renderProjectIcon, safeAsync, setProjectIcon } from '../utils'
 import { renderAddButton } from '../ui/composites/addButton'
 import { Avatar } from '../ui/primitives/Avatar'
 import { IconButton } from '../ui/primitives/IconButton'
@@ -20,8 +20,6 @@ const PROJECT_COLORS = [
   '#767491',
   '#8aab6b'
 ]
-
-const PROJECT_ICONS = ['📋', '🚀', '💡', '🎯', '🔬', '🏗', '📊', '🎨', '📱', '🛠', '📝', '⚡']
 
 /** The project fields this modal edits. Tasks and saved views are not among them. */
 interface ProjectDraft {
@@ -45,6 +43,7 @@ export class ProjectModal extends Modal {
   private draft: ProjectDraft
   private original: ProjectDraft
   private isNew: boolean
+  private iconPickerCleanup: (() => void) | null = null
 
   constructor(
     app: App,
@@ -79,6 +78,8 @@ export class ProjectModal extends Modal {
   }
 
   onClose(): void {
+    this.iconPickerCleanup?.()
+    this.iconPickerCleanup = null
     this.contentEl.empty()
   }
 
@@ -101,25 +102,78 @@ export class ProjectModal extends Modal {
     const topRow = el.createDiv('pm-project-top-row')
 
     const iconWrap = topRow.createDiv('pm-icon-picker')
-    const iconBtn = iconWrap.createEl('button', { text: this.draft.icon, cls: 'pm-icon-picker-btn' })
+    const iconBtn = iconWrap.createEl('button', { cls: 'pm-icon-picker-btn' })
+    iconBtn.type = 'button'
     iconBtn.setAttribute('aria-label', t('Select icon'))
     iconBtn.setAttribute('aria-haspopup', 'true')
+    iconBtn.setAttribute('aria-expanded', 'false')
 
     const iconGrid = iconWrap.createDiv('pm-icon-grid')
     iconGrid.addClass('pm-hidden')
-    for (const emoji of PROJECT_ICONS) {
-      const btn = iconGrid.createEl('button', { text: emoji, cls: 'pm-icon-option' })
-      btn.setAttribute('aria-label', `${t('Select icon')}: ${emoji}`)
-      btn.addEventListener('click', () => {
-        this.draft.icon = emoji
-        iconBtn.textContent = emoji
-        iconGrid.addClass('pm-hidden')
-        renderPreview()
-      })
+    const iconSearch = iconGrid.createEl('input', { type: 'search', cls: 'pm-icon-picker-search' })
+    iconSearch.placeholder = t('Search icons')
+    iconSearch.setAttribute('aria-label', t('Search icons'))
+    const iconOptions = iconGrid.createDiv('pm-icon-options')
+    const allIconIds = Array.from(new Set([...PROJECT_ICON_IDS, ...getIconIds()]))
+
+    const renderIconButton = () => setProjectIcon(iconBtn, this.draft.icon)
+    const renderIconOptions = (query = '') => {
+      iconOptions.empty()
+      const normalized = query.trim().toLowerCase()
+      const filtered = allIconIds.filter((id) => !normalized || id.includes(normalized))
+      const ids = normalized ? filtered.slice(0, 96) : filtered.slice(0, 30)
+      for (const id of ids) {
+        const value = `lucide:${id}`
+        const btn = iconOptions.createEl('button', { cls: 'pm-icon-option' })
+        btn.type = 'button'
+        btn.title = id
+        btn.setAttribute('aria-label', `${t('Select icon')}: ${id}`)
+        btn.setAttribute('aria-pressed', String(this.draft.icon === value || this.draft.icon === id))
+        if (this.draft.icon === value || this.draft.icon === id) btn.addClass('pm-icon-option--selected')
+        renderProjectIcon(btn, value, 'pm-icon-option-glyph')
+        btn.addEventListener('click', () => {
+          this.draft.icon = value
+          renderIconButton()
+          iconGrid.addClass('pm-hidden')
+          iconBtn.setAttribute('aria-expanded', 'false')
+          renderPreview()
+        })
+      }
+      if (ids.length === 0) iconOptions.createDiv({ text: t('No icons found'), cls: 'pm-icon-picker-empty' })
     }
+
+    renderIconButton()
+    renderIconOptions()
+    iconSearch.addEventListener('input', () => renderIconOptions(iconSearch.value))
     iconBtn.addEventListener('click', () => {
-      iconGrid.toggleClass('pm-hidden', !iconGrid.hasClass('pm-hidden'))
+      const opening = iconGrid.hasClass('pm-hidden')
+      iconGrid.toggleClass('pm-hidden', !opening)
+      iconBtn.setAttribute('aria-expanded', String(opening))
+      if (opening) {
+        iconSearch.value = ''
+        renderIconOptions()
+        window.setTimeout(() => iconSearch.focus(), 0)
+      }
     })
+    const outsideHandler = (event: PointerEvent) => {
+      if (!iconWrap.contains(event.target as Node)) {
+        iconGrid.addClass('pm-hidden')
+        iconBtn.setAttribute('aria-expanded', 'false')
+      }
+    }
+    const escapeHandler = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        iconGrid.addClass('pm-hidden')
+        iconBtn.setAttribute('aria-expanded', 'false')
+        iconBtn.focus()
+      }
+    }
+    activeDocument.addEventListener('pointerdown', outsideHandler)
+    iconSearch.addEventListener('keydown', escapeHandler)
+    this.iconPickerCleanup = () => {
+      activeDocument.removeEventListener('pointerdown', outsideHandler)
+      iconSearch.removeEventListener('keydown', escapeHandler)
+    }
 
     const titleWrap = topRow.createDiv('pm-project-title-wrap')
     titleWrap.createEl('label', { text: t('Project name'), cls: 'pm-label' })
@@ -181,7 +235,7 @@ export class ProjectModal extends Modal {
     })
 
     const renderPreview = () => {
-      previewIcon.setText(iconBtn.textContent || '📋')
+      setProjectIcon(previewIcon, this.draft.icon || DEFAULT_PROJECT_ICON)
       previewTitle.setText(titleInput.value.trim() || t('New project'))
       previewDescription.setText(descArea.value.trim() || t('No description'))
       previewBar.setCssStyles({ background: this.draft.color })

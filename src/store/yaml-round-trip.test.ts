@@ -135,6 +135,15 @@ describe('task round-trip', () => {
 })
 
 describe('project round-trip', () => {
+  it('stores Lucide project icons without leaking the storage prefix into the note heading', () => {
+    const p = makeProject('Lucide Project', 'Projects/Lucide.md')
+    p.icon = 'lucide:rocket'
+
+    const md = serializeProject(p)
+    expect(md).toContain('\n# Lucide Project\n')
+    expect(md).not.toContain('# lucide:rocket')
+  })
+
   it('preserves core project fields', () => {
     const p = makeProject('My Project', 'Projects/MyProject.md')
     p.description = 'A great project.'

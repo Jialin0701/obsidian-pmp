@@ -97,6 +97,47 @@ export function isIconName(icon: string): boolean {
   return known
 }
 
+/** Project icons use an explicit prefix for new Lucide values, while keeping old
+ * bare Lucide ids and emoji values readable for backwards compatibility. */
+export const DEFAULT_PROJECT_ICON = 'lucide:folder-kanban'
+
+export const PROJECT_ICON_IDS = [
+  'folder-kanban',
+  'briefcase-business',
+  'target',
+  'rocket',
+  'lightbulb',
+  'calendar-days',
+  'code-2',
+  'palette',
+  'chart-no-axes-combined',
+  'file-text',
+  'flask-conical',
+  'construction',
+  'smartphone',
+  'wrench',
+  'notebook-tabs'
+] as const
+
+export function projectIconName(icon: string): string | null {
+  const candidate = icon.startsWith('lucide:') ? icon.slice('lucide:'.length) : icon
+  return candidate && isIconName(candidate) ? candidate : null
+}
+
+/** Render a project icon as a themed Lucide SVG or preserve a legacy text icon. */
+export function setProjectIcon(el: HTMLElement, icon: string): HTMLElement {
+  el.empty()
+  const name = projectIconName(icon)
+  if (name) setIcon(el, name)
+  else if (icon.startsWith('lucide:')) setIcon(el, projectIconName(DEFAULT_PROJECT_ICON) ?? 'folder-kanban')
+  else el.setText(icon || '📋')
+  return el
+}
+
+export function renderProjectIcon(parent: HTMLElement, icon: string, cls?: string): HTMLElement {
+  return setProjectIcon(parent.createSpan({ cls }), icon)
+}
+
 /** "🔴 Critical". Named icons drop out; they can't render as text, so callers use setIcon. */
 export function formatBadgeText(icon: string | undefined, label: string): string {
   if (icon && isIconName(icon)) return label

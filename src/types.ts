@@ -62,7 +62,7 @@ export interface Project {
   title: string
   description: string
   color: string // hex
-  icon: string // emoji
+  icon: string // lucide:<id> for new projects, or a legacy emoji/text value
   tasks: Task[]
   customFields: CustomFieldDef[]
   teamMembers: string[]
@@ -242,7 +242,7 @@ export function makeProject(title: string, filePath: string): Project {
     title,
     description: '',
     color: '#8b72be',
-    icon: '📋',
+    icon: 'lucide:folder-kanban',
     tasks: [],
     customFields: [],
     teamMembers: [],

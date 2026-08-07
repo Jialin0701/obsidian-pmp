@@ -97,6 +97,11 @@
   border-radius: var(--radius-s);
   transition: transform 0.15s;
 }
+.pm-toolbar-icon svg {
+  width: 22px;
+  height: 22px;
+  stroke-width: 1.8;
+}
 .pm-toolbar-icon:hover {
   transform: scale(1.15);
 }
@@ -201,23 +206,52 @@
   outline-offset: 2px;
 }
 
-.pm-project-card-bar {
-  height: 4px;
-}
 .pm-project-card-body {
   padding: 15px 16px 16px;
 }
+.pm-project-card-identity {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  margin-bottom: 10px;
+}
 .pm-project-card-icon {
-  font-size: 28px;
-  margin-bottom: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 30px;
+  width: 30px;
+  height: 30px;
+  color: var(--text-muted);
+  font-size: 22px;
+}
+.pm-project-card-icon svg {
+  width: 22px;
+  height: 22px;
+  stroke-width: 1.8;
 }
 .pm-project-card-title {
+  min-width: 0;
+  flex: 1;
   font-size: var(--font-ui-medium);
   font-weight: 600;
-  margin: 0 0 8px;
+  margin: 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+.pm-project-picker-icon {
+  display: inline-flex;
+  align-items: center;
+  margin-right: 8px;
+  color: var(--text-muted);
+  vertical-align: middle;
+}
+.pm-project-picker-icon svg {
+  width: 16px;
+  height: 16px;
+  stroke-width: 1.8;
 }
 .pm-project-card-meta {
   display: flex;
@@ -239,11 +273,11 @@
 
 .pm-project-list-row {
   display: grid;
-  grid-template-columns: 4px minmax(0, 1fr) minmax(170px, 240px);
+  grid-template-columns: minmax(0, 1fr) minmax(170px, 240px);
   align-items: center;
   gap: 14px;
   min-height: 76px;
-  padding: 12px 16px 12px 12px;
+  padding: 12px 16px;
   border: 1px solid var(--pm-ghost-border);
   border-radius: var(--radius-m);
   background: var(--background-secondary);
@@ -260,12 +294,6 @@
   background: var(--background-primary-alt);
 }
 
-.pm-project-list-row-swatch {
-  align-self: stretch;
-  min-height: 48px;
-  border-radius: 99px;
-}
-
 .pm-project-list-row-identity {
   display: flex;
   align-items: center;
@@ -280,8 +308,13 @@
   width: 36px;
   height: 36px;
   border-radius: 10px;
-  background: var(--background-modifier-hover);
+  color: var(--text-muted);
   font-size: 20px;
+}
+.pm-project-list-row-icon svg {
+  width: 20px;
+  height: 20px;
+  stroke-width: 1.8;
 }
 
 .pm-project-list-row-copy {
@@ -354,12 +387,12 @@
   }
 
   .pm-project-list-row {
-    grid-template-columns: 4px minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr);
     gap: 10px 12px;
     padding-right: 12px;
   }
 
   .pm-project-list-row-metrics {
-    grid-column: 2;
+    grid-column: 1;
   }
 }
