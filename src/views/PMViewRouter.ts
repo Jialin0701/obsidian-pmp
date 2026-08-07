@@ -15,8 +15,12 @@ export class PMViewRouter {
 
   async openProject(file: TFile): Promise<void> {
     const ws = this.plugin.app.workspace
-    const leaf = ws.getLeaf('tab')
-    await leaf.setViewState({ type: PM_PROJECT_VIEW_TYPE, state: { filePath: file.path } })
+    const existing = ws.getLeavesOfType(PM_PROJECT_VIEW_TYPE).find((leaf) => {
+      const state = leaf.getViewState().state
+      return typeof state === 'object' && state !== null && 'filePath' in state && state.filePath === file.path
+    })
+    const leaf = existing ?? ws.getLeaf('tab')
+    if (!existing) await leaf.setViewState({ type: PM_PROJECT_VIEW_TYPE, state: { filePath: file.path } })
     await ws.revealLeaf(leaf)
   }
 
