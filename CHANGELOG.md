@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.12.0] - 2026-08-07
+
+### Added
+
+- New projects can choose from Obsidian's native Lucide icons with search and a curated set of common icons.
+- Project icons now render consistently in the project dashboard, project view, task editor, and project picker.
+
+### Changed
+
+- Existing emoji project icons remain supported while new icons use a compatible prefixed format.
+- Project cards and list rows use a quieter Obsidian-native style without colored project edge bars.
+- Project progress indicators use the active Obsidian accent color instead of each project's color.
+
 ## [1.11.0] - 2026-08-07
 
 ### Added
