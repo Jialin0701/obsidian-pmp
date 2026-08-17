@@ -44,6 +44,22 @@ Card-based board grouped by status. Drag cards between columns to update status 
 
 <video src="https://github.com/user-attachments/assets/316fc43b-6915-499a-a6ad-0680c462d014" autoplay loop muted playsinline width="400"></video>
 
+### Action center
+
+The Action center aggregates unfinished tasks from every project so you can see what needs attention without opening projects one by one. Tasks are grouped by urgency: overdue, due today, the next seven days, blocked, in progress, and without a due date. Use the list or board toggle to change the layout, search across task and project names, and click a task to reveal its project.
+
+You can also embed the same live view in a daily note with the `pm-focus` code block:
+
+````markdown
+```pm-focus
+date: note
+days: 7
+view: list
+```
+````
+
+`date: note` uses a `YYYY-MM-DD` daily-note filename as the reference date. Use `date: today` (the default) or an explicit `YYYY-MM-DD` value when the note is not date-named. The block refreshes when project task files change and does not duplicate task data into the note.
+
 ## Features
 
 ### Task management
@@ -206,6 +222,7 @@ Or open the listing directly: [community.obsidian.md/plugins/project-manager](ht
 | Command | What it does |
 |---|---|
 | Open projects pane | Open the project list |
+| Open action center | See urgent and upcoming tasks across all projects |
 | Create new project | Open the new project modal |
 | Create new task | Pick a project, then create a task |
 | Create new subtask | Pick a project and a parent task |

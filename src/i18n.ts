@@ -6,6 +6,19 @@ const ZH: Record<string, string> = {
   'Project manager': '项目管理',
   Projects: '项目',
   Project: '项目',
+  'Action center': '行动中心',
+  'Open action center': '打开行动中心',
+  'See what needs attention across all projects.': '查看所有项目中需要优先处理的事项。',
+  'active tasks': '个未完成任务',
+  overdue: '已逾期',
+  'Due today': '今天到期',
+  'Next 7 days': '未来 7 天',
+  'No due date': '无截止日期',
+  Later: '稍后',
+  'No active tasks': '没有未完成任务',
+  'Everything is up to date.': '所有任务都已处理完毕。',
+  'No tasks': '暂无任务',
+  'Loading…': '加载中…',
   General: '常规',
   Style: '样式',
   Gantt: '甘特图',
@@ -363,6 +376,8 @@ export function t(text: string): string {
   if (overdue) return `逾期 ${overdue[1]} 天`
   const inDays = text.match(/^In (\d+)d$/)
   if (inDays) return `${inDays[1]} 天后`
+  const nextDays = text.match(/^Next (\d+) days$/)
+  if (nextDays) return `未来 ${nextDays[1]} 天`
   const late = text.match(/^(\d+)d late$/)
   if (late) return `晚了 ${late[1]} 天`
   const selected = text.match(/^(\d+) selected$/)

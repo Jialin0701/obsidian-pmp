@@ -37,6 +37,8 @@ export function renderProjectListToolbar(ctx: ProjectListContext): void {
     onChange: ctx.onViewModeChange
   })
 
+  new ButtonComponent(right).setButtonText(t('Action center')).onClick(() => void ctx.plugin.router.openActionCenter())
+
   new ButtonComponent(right)
     .setButtonText(t('+ new project'))
     .setCta()

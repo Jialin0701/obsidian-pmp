@@ -53,3 +53,38 @@ describe('PMViewRouter.openProject', () => {
     expect(revealLeaf).toHaveBeenCalledWith(newLeaf)
   })
 })
+
+describe('PMViewRouter.openActionCenter', () => {
+  const revealLeaf = vi.fn<(leaf: unknown) => void>()
+  const getLeaf = vi.fn<(kind: string) => unknown>()
+  const getLeavesOfType = vi.fn<(type: string) => unknown[]>()
+  const workspace = { revealLeaf, getLeaf, getLeavesOfType }
+  const router = new PMViewRouter({ app: { workspace } } as unknown as PMPlugin)
+
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  it('reuses an existing action center leaf', async () => {
+    const existingLeaf = { setViewState: vi.fn<(state: unknown) => void>() }
+    getLeavesOfType.mockReturnValue([existingLeaf])
+
+    await router.openActionCenter()
+
+    expect(getLeavesOfType).toHaveBeenCalledWith('pm-action-center')
+    expect(getLeaf).not.toHaveBeenCalled()
+    expect(revealLeaf).toHaveBeenCalledWith(existingLeaf)
+  })
+
+  it('opens a new action center tab when none exists', async () => {
+    const newLeaf = { setViewState: vi.fn<(state: unknown) => void>() }
+    getLeavesOfType.mockReturnValue([])
+    getLeaf.mockReturnValue(newLeaf)
+
+    await router.openActionCenter()
+
+    expect(getLeaf).toHaveBeenCalledWith('tab')
+    expect(newLeaf.setViewState).toHaveBeenCalledWith({ type: 'pm-action-center', state: {} })
+    expect(revealLeaf).toHaveBeenCalledWith(newLeaf)
+  })
+})

@@ -6,6 +6,7 @@ import type { TaskSource } from './store'
 import { PMSettingTab } from './settings'
 import { ProjectView, PM_PROJECT_VIEW_TYPE } from './views/ProjectView'
 import { DashboardView, PM_DASHBOARD_VIEW_TYPE } from './views/DashboardView'
+import { ActionCenterView, PM_ACTION_CENTER_VIEW_TYPE, registerActionCenterCodeBlock } from './views/ActionCenterView'
 import { registerStyleguide } from './views/styleguide/StyleguideView'
 import { PMViewRouter } from './views/PMViewRouter'
 import { openProjectModal, openTaskModal, openProjectPicker, openTaskPicker, openImportModal } from './ui/ModalFactory'
@@ -59,6 +60,8 @@ export default class PMPlugin extends Plugin {
 
     this.registerView(PM_PROJECT_VIEW_TYPE, (leaf) => new ProjectView(leaf, this))
     this.registerView(PM_DASHBOARD_VIEW_TYPE, (leaf) => new DashboardView(leaf, this))
+    this.registerView(PM_ACTION_CENTER_VIEW_TYPE, (leaf) => new ActionCenterView(leaf, this))
+    registerActionCenterCodeBlock(this)
     if (__STYLEGUIDE__) registerStyleguide(this)
 
     this.app.workspace.onLayoutReady(
@@ -77,6 +80,14 @@ export default class PMPlugin extends Plugin {
       name: t('Open projects pane'),
       callback: () => {
         void this.router.openDashboard()
+      }
+    })
+
+    this.addCommand({
+      id: 'open-action-center',
+      name: t('Open action center'),
+      callback: () => {
+        void this.router.openActionCenter()
       }
     })
 
@@ -279,6 +290,9 @@ export default class PMPlugin extends Plugin {
     if (typeof activeDocument !== 'undefined' && activeDocument.body) translateElementTree(activeDocument.body)
     for (const leaf of this.app.workspace.getLeavesOfType(PM_DASHBOARD_VIEW_TYPE)) {
       if (leaf.view instanceof DashboardView) leaf.view.render()
+    }
+    for (const leaf of this.app.workspace.getLeavesOfType(PM_ACTION_CENTER_VIEW_TYPE)) {
+      if (leaf.view instanceof ActionCenterView) leaf.view.render()
     }
     for (const leaf of this.app.workspace.getLeavesOfType(PM_PROJECT_VIEW_TYPE)) {
       if (leaf.view instanceof ProjectView) leaf.view.refreshLocalizedUi()

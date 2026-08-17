@@ -28,6 +28,7 @@ describe('i18n', () => {
     expect(t('3 selected')).toBe('已选择 3 项')
     expect(t('2/7 tasks')).toBe('2/7 个任务')
     expect(t('3d overdue')).toBe('逾期 3 天')
+    expect(t('Next 14 days')).toBe('未来 14 天')
     expect(t('Import (5)')).toBe('导入（5）')
     expect(t('Time tracking (2h)')).toBe('时间记录（2h）')
     expect(t('Option 3')).toBe('选项 3')

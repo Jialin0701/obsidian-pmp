@@ -2,6 +2,7 @@ import { TFile } from 'obsidian'
 import type PMPlugin from '../main'
 import { PM_DASHBOARD_VIEW_TYPE } from './DashboardView'
 import { PM_PROJECT_VIEW_TYPE } from './ProjectView'
+import { PM_ACTION_CENTER_VIEW_TYPE } from './ActionCenterViewType'
 
 export class PMViewRouter {
   constructor(private plugin: PMPlugin) {}
@@ -10,6 +11,14 @@ export class PMViewRouter {
     const ws = this.plugin.app.workspace
     const leaf = ws.getLeaf('tab')
     await leaf.setViewState({ type: PM_DASHBOARD_VIEW_TYPE, state: {} })
+    await ws.revealLeaf(leaf)
+  }
+
+  async openActionCenter(): Promise<void> {
+    const ws = this.plugin.app.workspace
+    const existing = ws.getLeavesOfType(PM_ACTION_CENTER_VIEW_TYPE)[0]
+    const leaf = existing ?? ws.getLeaf('tab')
+    if (!existing) await leaf.setViewState({ type: PM_ACTION_CENTER_VIEW_TYPE, state: {} })
     await ws.revealLeaf(leaf)
   }
 
