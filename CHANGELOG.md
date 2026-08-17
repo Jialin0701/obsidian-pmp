@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.14.0] - 2026-08-17
+
+### Added
+
+- A new Action center brings unfinished tasks from every project into one urgency-focused list or board, grouped by overdue, due today, blocked, upcoming, active, unscheduled, and later work.
+- Daily notes can embed a live cross-project task view with a `pm-focus` code block, using today, the note date, or an explicit date as its planning reference.
+- The project dashboard and command palette now provide direct access to the Action center.
+
+### Changed
+
+- Statuses and priorities can be updated directly from the Action center, while task edits and project navigation reuse the existing project and task workflows.
+- Action center searches filter in place without reloading projects or dropping keyboard focus.
+
 ## [1.13.1] - 2026-08-07
 
 ### Changed
