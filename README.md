@@ -200,7 +200,7 @@ Or open the listing directly: [community.obsidian.md/plugins/project-manager](ht
 
 1. Install the [BRAT plugin](https://github.com/TfTHacker/obsidian42-brat) from the community store.
 2. Open BRAT settings > **Add Beta Plugin**.
-3. Enter: `https://github.com/StepanKropachev/obsidian-pm`
+3. Enter: `https://github.com/Jialin0701/obsidian-pmp`
 4. Enable the plugin in **Settings > Community plugins**.
 
 ### Manual
@@ -266,7 +266,7 @@ Task description in Markdown goes here.
 
 ## Requirements
 
-- Obsidian **1.4.0** or later
+- Obsidian **1.13.0** or later
 - Desktop and mobile supported
 
 ## Contributing
@@ -281,6 +281,8 @@ If you want to contribute, please follow these rules:
 4. **Keep it small:** PRs should be strictly focused on a single issue. 
 
 Bug fixes and thoroughly discussed features are always welcome!
+
+UI changes should follow the [component styleguide](docs/styleguide.md).
 
 ## License
 

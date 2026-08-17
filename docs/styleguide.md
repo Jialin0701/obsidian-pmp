@@ -123,7 +123,9 @@ Take resolved data + callbacks via props. No `plugin`, no `store`, no `onRefresh
 
 - **KanbanCard** - `KanbanCard.ts`. Props: task, priorityColor, descriptionPreview, parentTitle, loggedHours, overdue, showTagColors + onClick/onContextMenu/onDragStart/onDragEnd. Composes Chip (milestone/subtask/recurring badges), renderTimeChip, renderDueChip, AvatarStack, ProgressBar (task progress), renderTagChip.
 - **KanbanColumn** - `KanbanColumn.ts`. Props: status, cards + drag/drop and card callbacks. Composes KanbanCard.
-- **ProjectCard** - `ProjectCard.ts`. Props: title, icon, color, tasksDone, tasksTotal, onClick, onContextMenu. Composes ProgressBar.
+- **ProjectCard** - `ProjectCard.ts`. Props: summary, onClick, onContextMenu. Shows the project icon, description, task/status summary, progress, participants, and last update date. Composes ProgressBar and `renderProjectMemberPills`.
+- **ProjectListRow** - `ProjectListRow.ts`. Props: summary, onClick, onContextMenu. Compact dashboard row with the project identity, description, participants, last update date, and task progress. Composes ProgressBar and `renderProjectMemberPills`.
+- **ProjectMemberPills** - `ProjectMemberPills.ts`. `renderProjectMemberPills(parent, members, cls)` renders up to three readable participant pills plus a `+N` overflow indicator, or the empty-team label.
 - **TaskRow** - `TaskRow.ts`. Props: taskId, depth, isDone, isArchived, isSelected, onRowClick. Bare `<tr>` with row-click routing that ignores interactive descendants; cells render into it.
 - **addButton** - `addButton.ts`. `renderAddButton(parent, label, onClick)` -> ghost "+ label" button (`pm-prop-add`). The only way to render an add button.
 - **tagChip** - `tagChip.ts`. `renderTagChip(parent, tag, colored)` -> outline tag Chip with optional color dot. The only way to render a tag.
