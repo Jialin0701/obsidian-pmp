@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.14.1] - 2026-08-17
+
+### Fixed
+
+- `pm-focus` blocks now treat `days` as a strict due-date horizon, excluding undated and later tasks while keeping overdue work visible.
+
 ## [1.14.0] - 2026-08-17
 
 ### Added
