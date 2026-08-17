@@ -58,7 +58,7 @@ view: list
 ```
 ````
 
-`date: note` uses a `YYYY-MM-DD` daily-note filename as the reference date. Use `date: today` (the default) or an explicit `YYYY-MM-DD` value when the note is not date-named. The block refreshes when project task files change and does not duplicate task data into the note.
+`date: note` uses a `YYYY-MM-DD` daily-note filename as the reference date. Use `date: today` (the default) or an explicit `YYYY-MM-DD` value when the note is not date-named. `days` limits the embedded block to overdue tasks and tasks due within that many days; tasks without a due date and later tasks are excluded. The block refreshes when project task files change and does not duplicate task data into the note.
 
 ## Features
 

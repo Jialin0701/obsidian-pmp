@@ -24,6 +24,7 @@ export interface ActionItem {
 export interface ActionCenterRenderOptions {
   referenceDate?: string
   horizonDays?: number
+  horizonOnly?: boolean
   mode?: ActionCenterMode
   showToolbar?: boolean
   compact?: boolean
@@ -85,7 +86,7 @@ export function classifyActionItem(
 
 export function collectActionItems(
   projects: Project[],
-  options: { referenceDate?: string; horizonDays?: number } = {},
+  options: { referenceDate?: string; horizonDays?: number; horizonOnly?: boolean } = {},
   getConfig?: (project: Project) => { statuses: StatusConfig[]; priorities: PriorityConfig[] }
 ): ActionItem[] {
   const reference = parsePlainDate(options.referenceDate ?? '') ?? Temporal.Now.plainDateISO()
@@ -99,6 +100,9 @@ export function collectActionItems(
     for (const { task } of flattenTasks(project.tasks)) {
       const classified = classifyActionItem(project, task, statuses, reference, horizonDays)
       if (!classified) continue
+      if (options.horizonOnly && (classified.daysUntilDue === null || classified.daysUntilDue > horizonDays)) {
+        continue
+      }
       items.push({ task, project, statuses, priorities, ...classified })
     }
   }
@@ -292,8 +296,10 @@ export function renderActionCenter(
   const query = opts.query ?? ''
   const referenceDate = opts.referenceDate ?? ''
   const horizonDays = opts.horizonDays ?? 7
-  const allItems = collectActionItems(projects, { referenceDate, horizonDays }, (project) =>
-    plugin.store.configFor(project)
+  const allItems = collectActionItems(
+    projects,
+    { referenceDate, horizonDays, horizonOnly: opts.horizonOnly },
+    (project) => plugin.store.configFor(project)
   )
 
   let summary: HTMLElement | null = null
@@ -341,7 +347,12 @@ export function renderActionCenterBlock(
   projects: Project[],
   opts: Omit<ActionCenterRenderOptions, 'showToolbar'> = {}
 ): void {
-  renderActionCenter(container, plugin, projects, { ...opts, showToolbar: false, compact: true })
+  renderActionCenter(container, plugin, projects, {
+    ...opts,
+    showToolbar: false,
+    compact: true,
+    horizonOnly: true
+  })
 }
 
 export function bucketLabelForTests(bucket: ActionCenterBucket, horizonDays = 7): string {

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { Temporal } from '../dates'
 import type { Project, Task } from '../types'
 import { buildTaskIndex } from '../store/TaskIndex'
-import { bucketLabelForTests, classifyActionItem } from './ActionCenter'
+import { bucketLabelForTests, classifyActionItem, collectActionItems } from './ActionCenter'
 
 const statuses = [
   { id: 'todo', label: 'To Do', color: '#888', icon: '', complete: false },
@@ -89,5 +89,30 @@ describe('Action center classification', () => {
 
   it('uses the configured horizon in the upcoming label', () => {
     expect(bucketLabelForTests('upcoming', 14)).toBe('Next 14 days')
+  })
+
+  it('limits embedded focus results to overdue and due-within-horizon tasks', () => {
+    const overdue = task({ id: 'overdue', due: '2026-08-16' })
+    const today = task({ id: 'today', due: '2026-08-17' })
+    const upcoming = task({ id: 'upcoming', due: '2026-08-24' })
+    const later = task({ id: 'later', due: '2026-08-25' })
+    const unscheduled = task({ id: 'unscheduled' })
+    const activeLater = task({ id: 'active-later', start: '2026-08-10', due: '2026-09-30' })
+    const p = project([overdue, today, upcoming, later, unscheduled, activeLater])
+    const config = () => ({ statuses, priorities: [] })
+
+    const allItems = collectActionItems([p], { referenceDate: '2026-08-17', horizonDays: 7 }, config)
+    expect(allItems.map((item) => item.task.id)).toEqual([
+      'overdue',
+      'today',
+      'upcoming',
+      'active-later',
+      'unscheduled',
+      'later'
+    ])
+
+    const items = collectActionItems([p], { referenceDate: '2026-08-17', horizonDays: 7, horizonOnly: true }, config)
+
+    expect(items.map((item) => item.task.id)).toEqual(['overdue', 'today', 'upcoming'])
   })
 })
