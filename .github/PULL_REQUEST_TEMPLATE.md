@@ -19,8 +19,9 @@ Fixes #<!-- Issue number — required -->
 ## Checklist
 
 - [ ] I discussed this change in an issue and got a thumbs-up before writing code.
-- [ ] `npm run build` passes with zero errors.
-- [ ] `npx eslint src/` passes with zero warnings — includes no inline styles, sentence-case UI text, no unnecessary non-null assertions.
+- [ ] `pnpm build` passes with zero errors.
+- [ ] `pnpm check:submission` passes with zero warnings — includes no inline styles, sentence-case UI text, no unnecessary non-null assertions.
+- [ ] `pnpm test` passes.
 - [ ] New UI follows the Quiet Architect design system (no emojis, no hard corners, no 1px dividers, no pure black text, depth via tonal stacking).
 - [ ] New modals are created through `ModalFactory`, never instantiated directly.
 - [ ] No `element.style.*` assignments — CSS classes only.
