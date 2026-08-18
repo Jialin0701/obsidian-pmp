@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.14.2] - 2026-08-18
+
+### Changed
+
+- Task tables now use a denser, more readable Bases-inspired layout with stable row heights, a wider title column, quieter separators, and clearer hover and focus states.
+- Task, status, priority, assignee, due date, progress, time, and tag cells now use more compact displays, overflow tooltips, and semantic relative due-date labels.
+- Selection, expand, title, and action columns stay visible while scrolling wide task tables, and narrow status and priority columns can collapse to icon-only cells.
+
 ## [1.14.1] - 2026-08-17
 
 ### Fixed
