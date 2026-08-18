@@ -88,8 +88,16 @@ export class TitleCell {
 
     if (task.tags.length) {
       const tagRow = this.el.createDiv('pm-table-tags')
-      for (const tag of task.tags) {
+      const visibleTags = task.tags.slice(0, 3)
+      for (const tag of visibleTags) {
         renderTagChip(tagRow, tag, props.showTagColors)
+      }
+      if (task.tags.length > visibleTags.length) {
+        new Chip(tagRow)
+          .setLabel(`+${task.tags.length - visibleTags.length}`)
+          .setVariant('outline')
+          .setTag()
+          .setTooltip(task.tags.slice(visibleTags.length).join(', '))
       }
     }
   }

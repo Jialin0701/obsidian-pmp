@@ -4,6 +4,8 @@ import type { DueUrgency } from '../dueChip'
 import { renderDueChip } from '../dueChip'
 import { Chip } from '../../primitives/Chip'
 import { makeInlineEdit } from './inlineEdit'
+import { t } from '../../../i18n'
+import { relativeDue } from '../../../dates'
 
 export interface DueDateCellProps {
   task: Task
@@ -39,7 +41,14 @@ export class DueDateCell {
       return
     }
 
-    const chip = renderDueChip(this.el, formatDateLong(task.due), props.urgency)
+    const exactDate = formatDateLong(task.due)
+    const relative = props.urgency === 'normal' ? null : relativeDue(task.due)
+    const chip = renderDueChip(this.el, relative?.text ?? exactDate, props.urgency)
+    if (relative?.tone === 'today') chip.setColor('var(--color-blue)')
+    chip.el.addClass(`pm-due-chip--${props.urgency}`)
+    if (relative) chip.el.addClass(`pm-due-tone--${relative.tone}`)
+    chip.setTooltip(exactDate)
+    chip.el.setAttribute('aria-label', `${exactDate}${props.urgency === 'overdue' ? ` (${t('Overdue')})` : ''}`)
     chip.onClick((e) => {
       e.stopPropagation()
       startEdit(chip.el)

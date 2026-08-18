@@ -1,3 +1,4 @@
+import { setIcon } from 'obsidian'
 import type PMPlugin from '../../main'
 import type { Project, FilterState, PriorityConfig, StatusConfig } from '../../types'
 import { type FlatTask, flattenTasks } from '../../store/TaskTreeOps'
@@ -27,9 +28,9 @@ export function getTableColumns(project: Project): TableColumn[] {
   return [
     { id: 'select', key: null, label: '', defaultWidth: 36, minWidth: 32, fixed: true },
     { id: 'expand', key: null, label: '', defaultWidth: 36, minWidth: 32, fixed: true },
-    { id: 'title', key: 'title', label: 'Task', defaultWidth: 280, minWidth: 180 },
-    { id: 'status', key: 'status', label: 'Status', defaultWidth: 130, minWidth: 100 },
-    { id: 'priority', key: 'priority', label: 'Priority', defaultWidth: 110, minWidth: 90 },
+    { id: 'title', key: 'title', label: 'Task', defaultWidth: 320, minWidth: 220 },
+    { id: 'status', key: 'status', label: 'Status', defaultWidth: 120, minWidth: 60 },
+    { id: 'priority', key: 'priority', label: 'Priority', defaultWidth: 100, minWidth: 54 },
     { id: 'assignees', key: 'assignees', label: 'Assignees', defaultWidth: 150, minWidth: 110 },
     { id: 'due', key: 'due', label: 'Due', defaultWidth: 120, minWidth: 100 },
     { id: 'progress', key: 'progress', label: 'Progress', defaultWidth: 130, minWidth: 110 },
@@ -180,10 +181,8 @@ export function renderTable(ctx: TableContext): void {
       th.querySelector('.pm-sort-indicator')?.remove()
       if (ctx.state.sortKey === key) {
         th.setAttribute('aria-sort', ctx.state.sortDir === 'asc' ? 'ascending' : 'descending')
-        th.createSpan({
-          text: ctx.state.sortDir === 'asc' ? ' \u2191' : ' \u2193',
-          cls: 'pm-sort-indicator'
-        })
+        const indicator = th.createSpan({ cls: 'pm-sort-indicator' })
+        setIcon(indicator, ctx.state.sortDir === 'asc' ? 'chevron-up' : 'chevron-down')
       } else {
         th.setAttribute('aria-sort', 'none')
       }
@@ -338,7 +337,7 @@ function fillTableBody(ctx: TableContext): void {
 }
 
 const ROW_OVERSCAN = 8
-export const ROW_HEIGHT_ESTIMATE = 36
+export const ROW_HEIGHT_ESTIMATE = 40
 
 /** The [start, end) slice of visibleRows to render at the current scroll position. */
 function computeWindow(state: TableState): { start: number; end: number } {

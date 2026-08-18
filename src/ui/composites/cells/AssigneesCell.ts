@@ -8,13 +8,17 @@ export class AssigneesCell {
       list.createSpan({ text: '—', cls: 'pm-assignee-empty' })
       return
     }
-    const visible = assignees.slice(0, 3)
+    const visible = assignees.slice(0, 2)
     for (const name of visible) {
       const chip = list.createSpan({ text: name, cls: 'pm-assignee-chip' })
       chip.setAttribute('title', name)
     }
     if (assignees.length > visible.length) {
-      list.createSpan({ text: `+${assignees.length - visible.length}`, cls: 'pm-assignee-chip pm-assignee-chip--more' })
+      const more = list.createSpan({
+        text: `+${assignees.length - visible.length}`,
+        cls: 'pm-assignee-chip pm-assignee-chip--more'
+      })
+      more.setAttribute('title', assignees.slice(visible.length).join(', '))
     }
     this.el.setAttribute('aria-label', assignees.join(', '))
   }
